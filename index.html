@@ -1,0 +1,1711 @@
+<title>Elevated Prompt City</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one phone-width column; header with skyline, three districts switched from a fixed bottom bar, credits as an overlay sheet. */
+:root{
+  --bg:#F6F2FF; --surface:#FFFFFF; --surface2:#ECE5FB; --ink:#1B1033; --ink2:#53476F; --line:#D5CAF0;
+  --accent:#5B21B6; --accent-ink:#FFFFFF; --accent-soft:#EBE0FF;
+  --brand:#4A1D96; --brand-ink:#FFFFFF; --gold:#FFC800; --gold-ink:#2A0F5E; --gold-soft:#FFF3B8;
+  --ph:#2A0F5E; --ph-bg:#FFE775; --ok:#1F7A4D;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#140B26; --surface:#1F1340; --surface2:#2B1B57; --ink:#F4EFFF; --ink2:#BEB0E3; --line:#3C2B70;
+  --accent:#C9B0FF; --accent-ink:#1A0B33; --accent-soft:#33206A;
+  --brand:#3B1A7A; --brand-ink:#FFFFFF; --gold:#FFD60A; --gold-ink:#2A0F5E; --gold-soft:#463A0A;
+  --ph:#FFE98A; --ph-bg:#4A3E0B; --ok:#5FD08E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#140B26; --surface:#1F1340; --surface2:#2B1B57; --ink:#F4EFFF; --ink2:#BEB0E3; --line:#3C2B70;
+  --accent:#C9B0FF; --accent-ink:#1A0B33; --accent-soft:#33206A;
+  --brand:#3B1A7A; --brand-ink:#FFFFFF; --gold:#FFD60A; --gold-ink:#2A0F5E; --gold-soft:#463A0A;
+  --ph:#FFE98A; --ph-bg:#4A3E0B; --ok:#5FD08E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 96px}
+.wrap{max-width:720px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,.pr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+a{color:var(--accent)}
+
+header.top{margin-top:16px;background:var(--brand);color:var(--brand-ink);border-radius:16px;padding:18px 18px 16px}
+.brand{min-width:0}
+.brand .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.brand h1{font-size:34px;line-height:1.05;font-weight:700;color:var(--brand-ink)}
+.brand .sub{margin:6px 0 0;font-size:15px;opacity:.92}
+.sky{display:block;color:var(--gold);margin-top:12px}
+.foot{margin-top:28px}
+.credits-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;border:2px solid var(--accent);background:var(--surface);border-radius:14px;padding:14px 16px}
+.credits-btn b{display:block;font-family:var(--f-display);font-size:18px}
+.credits-btn small{display:block;font-size:14px;color:var(--ink2)}
+.credits-btn .go{flex:none;font-weight:700;color:var(--accent)}
+
+.lead{color:var(--ink2);margin:18px 0 14px;max-width:60ch}
+.lead h2{font-size:26px;line-height:1.15;color:var(--ink);margin-bottom:4px}
+.lead span{display:block}
+
+.seg{display:flex;background:var(--surface2);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:9px 6px;border-radius:8px;font-weight:600;font-size:15px;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:14.5px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.chip .n{opacity:.6;margin-left:5px;font-variant-numeric:tabular-nums}
+.tools{display:flex;gap:8px;align-items:center;margin-top:8px}
+.search{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit}
+.count{font-size:12.5px;color:var(--ink2);margin:12px 0 4px;font-variant-numeric:tabular-nums}
+
+.list{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h3{font-size:18px;font-weight:700;line-height:1.2}
+.star{flex:none;border:0;background:transparent;font-size:22px;line-height:1;padding:2px 4px;color:var(--ink2)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11.5px;font-weight:600;letter-spacing:.03em;border-radius:6px;padding:2px 8px;background:var(--surface2);color:var(--ink2)}
+.tag.role{background:var(--accent-soft);color:var(--accent)}
+.pr{font-family:var(--f-mono);font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink)}
+.pr.clip{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.ph{color:var(--ph);background:var(--ph-bg);border-radius:4px;padding:0 3px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;font-weight:600;font-size:14px}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.btn.ghost{background:transparent}
+.pat{font-size:12px;color:var(--ink2)}
+.pat a{white-space:nowrap}
+.empty{padding:28px 8px;text-align:center;color:var(--ink2)}
+
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.goal{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.goal b{font-family:var(--f-display);font-size:16px;line-height:1.2}
+.goal span{font-size:12.5px;color:var(--ink2)}
+.goal em{font-style:normal;font-size:11.5px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.step.done{opacity:.6}
+.step-h{display:flex;gap:10px;align-items:baseline}
+.step-n{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:500;white-space:nowrap}
+.step h3{font-size:17px}
+.why{font-size:13px;color:var(--ink2);margin:0}
+.check{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);margin-left:auto;white-space:nowrap}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.back{border:0;background:none;color:var(--accent);font-weight:600;padding:4px 0;margin-top:6px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+.form{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.field label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.field input,.field textarea{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit;resize:vertical}
+.prog{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.prog-t{font-size:12.5px;color:var(--ink2);margin-top:6px;font-variant-numeric:tabular-nums}
+.prev-h{margin-top:20px;font-size:17px}
+.prev{margin-top:8px}
+.prev .fill{background:var(--accent-soft);color:var(--ink);border-radius:4px;padding:0 2px}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));z-index:5}
+nav.tabs .in{display:flex;gap:6px;width:100%;max-width:720px}
+nav.tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--ink2)}
+nav.tabs button b{font-family:var(--f-display);font-size:15px}
+nav.tabs button small{font-size:11px;letter-spacing:.04em}
+nav.tabs button[aria-selected="true"]{background:var(--brand);color:var(--gold)}
+
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet .wrap{padding-top:8px}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.repos{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
+.repos li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;min-width:0}
+.repos .ix{font-family:var(--f-mono);font-size:12px;color:var(--accent);width:22px;flex:none;padding-top:2px;font-variant-numeric:tabular-nums}
+.repos a{font-weight:600;word-break:break-all}
+.repos p{margin:0;font-size:13px;color:var(--ink2)}
+.note{font-size:13px;color:var(--ink2)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.facts{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+.facts b{font-family:var(--f-display)}
+.secthead{font-size:22px;line-height:1.2;margin:28px 0 4px}
+.sub2{margin:0 0 10px;color:var(--ink2)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp-s{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;background:var(--bg)}
+.cmp-s p{margin:0;overflow-wrap:anywhere}
+.cmp-s.strong{border:2px solid var(--accent);background:var(--surface)}
+.map{display:flex;flex-direction:column;gap:8px}
+.map-r{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;width:100%}
+.map-r b{font-family:var(--f-display);font-size:17px;display:block}
+.map-r small{display:block;font-size:14px;color:var(--ink2)}
+.map-r .go{margin-left:auto;color:var(--accent);font-weight:700;white-space:nowrap}
+.pl{background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px}
+.pl .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.pl h3{font-size:24px;color:var(--brand-ink)}
+.pl p{margin:0;opacity:.94}
+.pl a.btn{text-decoration:none;display:inline-block;background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px}
+.vid{border:1px solid var(--line);background:var(--surface);border-radius:10px;min-height:44px;font-weight:600;font-variant-numeric:tabular-nums}
+.vid.on{background:var(--brand);border-color:var(--brand);color:var(--gold)}
+.safe{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.safe li{display:flex;gap:10px}
+.safe li::before{content:"";flex:none;width:10px;height:10px;border-radius:3px;background:var(--gold);border:1px solid var(--brand);margin-top:7px}
+@media (max-width:560px){.cmp{grid-template-columns:1fr}}
+@media (max-width:420px){nav.tabs button{padding:8px 2px}nav.tabs button b{font-size:13.5px;white-space:nowrap}nav.tabs button small{font-size:10px;letter-spacing:.02em;white-space:nowrap}nav.tabs .in{gap:4px}}
+@media (max-width:380px){.goals{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="kicker">The Elevation Citadel</div>
+      <h1>Elevated Prompt City</h1>
+      <p class="sub">Say what you mean. Get what you need.</p>
+      <svg class="sky" width="168" height="22" viewBox="0 0 168 22" aria-hidden="true">
+        <g fill="currentColor">
+          <rect x="0" y="12" width="10" height="10"/><rect x="13" y="6" width="10" height="16"/><rect x="26" y="14" width="8" height="8"/>
+          <rect x="37" y="2" width="12" height="20"/><rect x="52" y="9" width="9" height="13"/><rect x="64" y="0" width="11" height="22"/>
+          <rect x="78" y="11" width="8" height="11"/><rect x="89" y="5" width="12" height="17"/><rect x="104" y="13" width="9" height="9"/>
+          <rect x="116" y="3" width="10" height="19"/><rect x="129" y="10" width="9" height="12"/><rect x="141" y="7" width="12" height="15"/>
+          <rect x="156" y="14" width="12" height="8"/>
+        </g>
+      </svg>
+    </div>
+  </header>
+
+  <main>
+    <section id="p0" aria-labelledby="t0"></section>
+    <section id="p1" aria-labelledby="t1" hidden></section>
+    <section id="p2" aria-labelledby="t2" hidden></section>
+    <section id="p3" aria-labelledby="t3" hidden></section>
+  </main>
+  <footer class="foot">
+    <button class="credits-btn" id="openCredits" type="button"><span><b>Credits</b><small>Built on 30 open-source GitHub repos</small></span><span class="go" aria-hidden="true">View all &rarr;</span></button>
+  </footer>
+</div>
+
+<nav class="tabs" aria-label="Sections"><div class="in" role="tablist">
+  <button type="button" role="tab" data-tab="0" aria-selected="true"><b>Start Here</b><small>NEW TO AI</small></button>
+  <button type="button" role="tab" data-tab="1" aria-selected="false"><b>Directory</b><small>50 PROMPTS</small></button>
+  <button type="button" role="tab" data-tab="2" aria-selected="false"><b>Navigator</b><small>PICK A GOAL</small></button>
+  <button type="button" role="tab" data-tab="3" aria-selected="false"><b>Foundry</b><small>BUILD IT</small></button>
+</div></nav>
+
+<div class="sheet" id="credits" hidden role="dialog" aria-modal="true" aria-labelledby="ct"><div class="wrap">
+  <div class="sheet-h"><h2 id="ct">Built on the shoulders of 30 repos</h2><button class="btn" id="closeCredits" type="button">Close</button></div>
+  <p class="note">Every prompt in this city is original wording. The techniques behind them (role framing, examples, step-by-step reasoning, spec-first building, context packs, testing) come from these public projects. Open them, star them, learn from the source.</p>
+  <p class="note">The Start Here page points to the free <a href="https://www.youtube.com/playlist?list=PLy9mLEnHHo4XLPIgN0NQkY8rcqw-eMutg" target="_blank" rel="noopener">ChatGPT for Beginners</a> video playlist by Sabrina Ramonov. The lesson text and prompts are original wording.</p>
+  <ol class="repos" id="repoList"></ol>
+</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 30 source repos ---------- */
+var REPOS=[
+["anthropics/prompt-eng-interactive-tutorial","Anthropic's hands-on course: prompt structure, XML tags, examples."],
+["anthropics/courses","Anthropic's notebooks on the API and prompting."],
+["anthropics/anthropic-cookbook","Copy-ready Claude recipes and patterns."],
+["openai/openai-cookbook","OpenAI's end-to-end recipes, few-shot and reasoning patterns."],
+["dair-ai/Prompt-Engineering-Guide","DAIR.AI guide: techniques, papers, context engineering."],
+["trigaten/Learn_Prompting","The Learn Prompting guide and courses."],
+["brexhq/prompt-engineering","Brex's company guide to prompting."],
+["NirDiamant/Prompt_Engineering","22 techniques as runnable notebooks."],
+["microsoft/generative-ai-for-beginners","Microsoft's 18-lesson generative AI course."],
+["promptslab/Awesome-Prompt-Engineering","Curated hub of papers, tools and guides."],
+["f/prompts.chat","The community prompt library (awesome-chatgpt-prompts)."],
+["langgptai/LangGPT","Structured, reusable prompt framework."],
+["langgptai/awesome-claude-prompts","Prompt collection tuned for Claude."],
+["x1xhlol/system-prompts-and-models-of-ai-tools","System prompts of major AI coding tools."],
+["jujumilk3/leaked-system-prompts","Dated archive of AI system prompts."],
+["dontriskit/awesome-ai-system-prompts","Curated AI system prompt collection."],
+["coleam00/Context-Engineering-Intro","Template for giving AI the context it needs."],
+["davidkimai/Context-Engineering","First-principles handbook on context design."],
+["Wirasm/PRPs-agentic-eng","Product requirement prompts for agentic engineering."],
+["Pimzino/claude-code-spec-workflow","Requirements, design, tasks, implementation."],
+["OneRedOak/claude-code-workflows","Workflows from an AI-native startup."],
+["hesreallyhim/awesome-claude-code","Skills, hooks, commands and workflows for Claude Code."],
+["ComposioHQ/awesome-claude-skills","Curated Claude skills and automation resources."],
+["shanraisshan/claude-code-best-practice","Practical Claude Code habits."],
+["github/awesome-copilot","Community Copilot instructions, agents and skills."],
+["PatrickJS/awesome-cursorrules","Rules files for AI code editors."],
+["promptfoo/promptfoo","Test prompts, run evals, catch regressions."],
+["stanfordnlp/dspy","Programming, not prompting."],
+["microsoft/promptbase","Microsoft Research's prompting techniques."],
+["microsoft/prompty","A portable format for LLM prompts."]
+];
+function repoLink(i){return REPOS[i][0];}
+
+/* ---------- Section 1 data: [title, role, task, project, pattern, sources, text] ---------- */
+/* ---------- prompt builder: every prompt follows the same professional structure ---------- */
+function mk(s,prev){
+  var t=[];
+  t.push("ROLE\n"+s.r);
+  t.push("OBJECTIVE\n"+s.o);
+  var inputs=(s.i||[]).slice();
+  if(prev)inputs.unshift("Earlier steps: build on everything we have settled in this chat. Do not contradict it.");
+  if(inputs.length||s.b){
+    t.push("INPUTS\n"+inputs.map(function(x){return "- "+x;}).join("\n")+(s.b?"\n\n"+s.b:""));
+  }
+  var steps=[];
+  if(s.ask!==false)steps.push("If any input above is missing or unclear, ask me up to 3 targeted questions and wait for my reply. Otherwise continue.");
+  steps=steps.concat(s.p||[]);
+  t.push("PROCESS\n"+steps.map(function(x,n){return (n+1)+". "+x;}).join("\n"));
+  if(s.k&&s.k.length)t.push("RULES\n"+s.k.map(function(x){return "- "+x;}).join("\n"));
+  t.push("OUTPUT FORMAT\n"+s.f);
+  if(s.c)t.push("QUALITY CHECK\nBefore you reply, verify that "+s.c);
+  return t.join("\n\n");
+}
+function E(title,role,task,project,pattern,sources,spec){return [title,role,task,project,pattern,sources,mk(spec)];}
+
+var P=[
+E("Idea Clarifier","Founder","Plan","General","Ask first, then answer",[4,0],{
+ r:"You are a sharp product strategist who turns vague ideas into testable concepts. You are direct, curious and never flatter a weak idea.",
+ o:"Turn my raw idea into a confirmed concept statement I can reuse as context in any other chat.",
+ i:["Raw idea: [YOUR IDEA IN 2-3 SENTENCES]","Who I think it is for: [AUDIENCE OR 'NOT SURE']","What done looks like: [OUTCOME OR 'NOT SURE']"],
+ ask:false,
+ p:["Restate the idea in one sentence to prove you understood it.","List the 5 biggest gaps that would stop someone building it (audience, problem, scope, constraints, success). Ask them as numbered questions, then stop and wait for my answers.","After my answers, write the concept statement: problem, audience, solution, why now, what is out of scope.","Name the single riskiest assumption and the cheapest way to test it this week."],
+ k:["Do not suggest features before the problem is clear.","Challenge anything vague. Label guesses as 'assumption'."],
+ f:"Round 1: one-sentence restatement and the numbered questions, then stop. After my reply: the concept statement (5 labeled lines), then the riskiest assumption and its test.",
+ c:"every claim in the concept statement traces back to something I said, and assumptions are labeled."}),
+E("Prompt Rewriter","Founder","Improve","General","Meta-prompting with a fixed structure",[11,27],{
+ r:"You are a prompt engineer who writes prompts that get the right answer on the first attempt.",
+ o:"Rewrite my rough request into a precise, reusable prompt and explain what you fixed.",
+ i:["Rough request: [PASTE YOUR REQUEST]","Chatbot I will use: [CHATGPT / CLAUDE / GEMINI / OTHER]","Who the answer is for: [AUDIENCE]"],
+ p:["Diagnose the rough request: list what is ambiguous, missing or contradictory.","Rewrite it using this structure: Role, Objective, Inputs, Process, Rules, Output format, Quality check.","Mark every part I must fill in with [BRACKETS].","Add a 3-line short version for quick use."],
+ k:["Keep my original intent. Do not add goals I did not state.","Prefer concrete verbs and measurable limits (length, count, format) over adjectives."],
+ f:"Diagnosis (bullets), Full prompt (code block), Short version (code block), Changes made (3 bullets).",
+ c:"the rewritten prompt could be pasted into a fresh chat and produce the intended result without further explanation."}),
+E("Role, Context, Task, Format","Writer","Write","General","Role + context + task + format",[0,10],{
+ r:"You are [ROLE, e.g. senior copywriter for B2B software] with [YEARS OR SPECIALTY].",
+ o:"[THE ONE THING YOU WANT PRODUCED]",
+ i:["Background: [WHO IT IS FOR, WHAT HAS HAPPENED SO FAR]","Source material: [FACTS, NOTES, LINKS I MUST USE]","Tone: [e.g. confident, warm, plain]"],
+ p:["Read the inputs and restate the task in one line.","Draft the output.","Review it against the rules and fix any miss before showing me."],
+ k:["Length: [WORD OR ITEM LIMIT].","Avoid: [WORDS, CLICHES, TOPICS].","Use only the facts I provided and flag anything you had to assume."],
+ f:"[FORMAT, e.g. 3 short paragraphs / table with columns A, B, C]",
+ c:"the output follows the length limit, the avoid-list and the format exactly."}),
+E("Examples First","Writer","Write","General","Few-shot examples in XML tags",[0,3,4],{
+ r:"You are a pattern-matching editor who learns a style from examples and reproduces it faithfully.",
+ o:"Produce [NUMBER] new [ITEM TYPE] about [TOPIC] that match the pattern of my examples.",
+ i:["Topic: [TOPIC]","Audience: [AUDIENCE]"],
+ b:"<example>\n[EXAMPLE 1]\n</example>\n<example>\n[EXAMPLE 2]\n</example>\n<example>\n[EXAMPLE 3]\n</example>",
+ p:["Analyze the examples and state the pattern in 4 bullets: structure, length, tone, devices.","Generate the new items following that pattern with fresh ideas.","Check each item against the pattern and rewrite any that drift."],
+ k:["Do not copy phrases from the examples.","Every item must be specific to the topic, not generic."],
+ f:"Pattern (4 bullets), then the numbered items.",
+ c:"each item matches the pattern in structure and tone and none repeats an example."}),
+E("Reason First","Student","Analyze","General","Step-by-step reasoning before the answer",[4,0,28],{
+ r:"You are a careful problem solver who shows reasoning before answering and flags uncertainty.",
+ o:"Solve the problem below and show a reasoning path I can verify.",
+ i:["Problem: [PROBLEM]","What I already tried: [ATTEMPTS OR 'NONE']","Level of detail: [BRIEF / FULL]"],
+ p:["Restate the problem and list the given facts and the unknowns.","Think it through step by step inside <thinking> tags.","Solve it, then verify the result by a second method or a sanity check.","Give the final answer inside <answer> tags."],
+ k:["State assumptions explicitly.","If the problem is underspecified, say what is missing instead of guessing."],
+ f:"<thinking>...</thinking> then <answer>...</answer>, then one line on confidence (high / medium / low) and why.",
+ c:"the verification step really tests the answer rather than repeating it."}),
+E("Draft, Critique, Revise","Writer","Improve","General","Self-critique loop",[4,17],{
+ r:"You are a writer and a ruthless editor in one.",
+ o:"Produce a first draft of [TASK], critique it hard against my criteria, then deliver an improved final version.",
+ i:["Task: [WHAT TO WRITE]","Audience: [AUDIENCE]","Criteria for success: [3-5 CRITERIA, e.g. clear, specific, under 150 words]"],
+ p:["Write draft 1.","Critique it: score each criterion 1-5 and quote the weakest lines.","Rewrite it, fixing every criterion below 4.","List what changed and why in 3 bullets."],
+ k:["The critique must quote the draft, not speak in generalities.","Do not praise before criticizing."],
+ f:"Draft 1, Critique (table: criterion, score, evidence), Final version, Change notes.",
+ c:"every criterion scores 4 or higher in the final version and you can point to the edit that earned it."}),
+E("Teach Me From Zero","Student","Learn","Course","Analogy, example, common mistakes",[5,8],{
+ r:"You are a patient tutor who builds understanding from what the learner already knows.",
+ o:"Teach me [TOPIC] so that I can explain it to someone else and use it in [CONTEXT].",
+ i:["Topic: [TOPIC]","What I already know: [PRIOR KNOWLEDGE]","Why I need it: [GOAL]"],
+ p:["Give a one-sentence definition in plain words.","Offer one analogy from something I already know.","Walk through one worked example slowly, explaining each step.","List 3 common mistakes and how to avoid them.","Ask me 2 questions to check my understanding and wait for my answers."],
+ k:["No jargon without defining it first.","Keep each section under 120 words."],
+ f:"Five headed sections matching the process, then the 2 check questions.",
+ c:"a beginner could follow every sentence without looking anything up."}),
+E("Study Plan","Student","Plan","Course","Time-boxed plan with self-tests",[8,5],{
+ r:"You are a learning coach who designs realistic study plans around the learner's real schedule.",
+ o:"Build a study plan that gets me to [GOAL] by [DATE].",
+ i:["Topic or exam: [TOPIC]","Hours per week I can study: [HOURS]","Current level: [LEVEL]","Weak areas: [WEAK AREAS]","Preferred methods: [e.g. practice problems, videos, flashcards]"],
+ p:["Break the topic into units and estimate the effort for each.","Schedule the units across the weeks and keep the final week for revision.","Add one practice task and one self-test per week.","Add a catch-up rule for missed days."],
+ k:["Never schedule more than my stated hours.","Put the hardest material early in the week."],
+ f:"Table: week, focus, tasks, practice, self-test, hours. Then 3 tips for sticking to it.",
+ c:"the weekly hours do not exceed my limit and every unit appears in the schedule."}),
+E("Quiz Me","Student","Learn","Course","Adaptive questioning",[1,5],{
+ r:"You are a strict but encouraging examiner running an adaptive quiz.",
+ o:"Test my knowledge of [TOPIC] and find my weak spots.",
+ i:["Topic: [TOPIC]","Level: [BEGINNER / INTERMEDIATE / ADVANCED]","Number of questions: [10]"],
+ ask:false,
+ p:["Ask one question at a time and wait for my answer.","Start at medium difficulty. Go harder after a correct answer and easier after a wrong one.","After each answer, say correct or not, explain in 2 sentences and name the concept tested.","After the last question, summarize my score, my weak concepts and what to review next."],
+ k:["Never reveal the answer before I reply.","Mix question types: definitions, application, and 'what would happen if'."],
+ f:"Question N of [10], one at a time. After the final one: score, weak concepts, a 3-item review list.",
+ c:"the difficulty actually adapted and the summary names specific concepts, not general topics."}),
+E("Structured Summary","Student","Analyze","General","Tagged input, fixed output",[0,2],{
+ r:"You are an analyst who summarizes without distorting.",
+ o:"Summarize the text below for [AUDIENCE] so they can decide [WHAT THEY MUST DECIDE].",
+ i:["Audience: [AUDIENCE]","Purpose: [DECISION OR USE]","Length cap: [WORDS]"],
+ b:"<text>\n[PASTE TEXT]\n</text>",
+ p:["Identify the author's main claim and the evidence for it.","Write a 2-sentence gist.","Extract 5 key points, each with its supporting fact.","List every number, date and name that matters.","Note what the text leaves unproven and give 3 open questions."],
+ k:["Use only what the text states. Label any inference as 'inferred'.","Keep quotes short and exact."],
+ f:"Gist, Key points (numbered), Facts table (item, value), Gaps, Open questions.",
+ c:"every key point can be located in the text and no figure has been changed."}),
+E("Teach It Back","Student","Learn","General","Learn by explaining",[5],{
+ r:"You are a Socratic coach. You never give the answer before I have attempted it.",
+ o:"Make me explain [TOPIC] in my own words, then correct me precisely.",
+ i:["Topic: [TOPIC]","Level I am aiming for: [e.g. explain it to a 12-year-old / pass the exam]"],
+ ask:false,
+ p:["Ask me to explain the topic in my own words and wait.","Compare my explanation with the correct one: list what I got right, what is wrong and what I skipped.","Ask one follow-up question on my weakest point and wait.","Only then give a model explanation."],
+ k:["Be specific: quote my words when correcting.","Stay encouraging, never vague."],
+ f:"Round 1: the invitation only. After my reply: Right / Wrong / Missing lists and a follow-up question.",
+ c:"you withheld the model answer until after my second attempt."}),
+E("Research Brief","Student","Analyze","General","Separate fact from guess",[4,6],{
+ r:"You are a research analyst who separates evidence from opinion.",
+ o:"Produce a brief on [TOPIC] that I can use for [PURPOSE].",
+ i:["Topic: [TOPIC]","Purpose: [PAPER / DECISION / PRESENTATION]","Depth: [QUICK OVERVIEW / DETAILED]","Region or time window: [SCOPE]"],
+ p:["Define the topic and the questions that matter.","Present the key facts, the main competing views and what is disputed.","Rate confidence for each major claim (high / medium / low) with the reason.","Recommend 5 primary sources to read next and say what each will answer."],
+ k:["Do not invent sources. If you cannot name a real one, say so.","Mark anything you are unsure about as 'verify'."],
+ f:"Headed sections: Definition, Key facts, Views, Disputes, Confidence table, Sources to read.",
+ c:"no claim is stated more confidently than the evidence allows."}),
+E("Brand Brief Interview","Designer","Plan","Brand","Interview-style prompting",[10,11],{
+ r:"You are a senior brand strategist running a discovery workshop.",
+ o:"Interview me, then write a one-page brand brief for [BRAND NAME].",
+ i:["Brand: [NAME]","What it offers: [PRODUCT OR SERVICE]","Known competitors: [LIST OR 'NONE']"],
+ ask:false,
+ p:["Round 1, purpose and audience: ask 4 questions and wait.","Round 2, personality and voice: ask 4 questions and wait.","Round 3, visual direction and constraints: ask 4 questions and wait.","Write the brief."],
+ k:["One round at a time. Do not preview later rounds.","Push back on generic answers ('quality', 'innovation') and ask for a concrete example."],
+ f:"After round 3, the brief with: mission, audience, positioning, 3 values, tone words, visual direction, and what the brand is not.",
+ c:"every line of the brief reflects one of my answers and nothing is generic."}),
+E("Logo Directions","Designer","Write","Brand","Distinct options with failure modes",[10,17],{
+ r:"You are a brand identity designer presenting concepts to a client.",
+ o:"Propose 4 distinct logo directions for [BRAND].",
+ i:["Brand brief: [PASTE BRIEF OR KEY POINTS]","Where the logo will live: [APP ICON, SIGNAGE, PRINT...]","Colour or symbol constraints: [CONSTRAINTS]"],
+ p:["Extract the 3 brand truths the logo must carry.","Create 4 directions that differ in concept, not just styling.","For each, give the idea, symbol, wordmark treatment, colour logic, one use where it shines and one where it may fail.","Recommend one and justify it."],
+ k:["Do not imitate any existing famous logo.","Describe each so a designer could sketch it without more questions."],
+ f:"For each direction: Name, Concept, Symbol, Type, Colour, Strength, Risk. Then Recommendation.",
+ c:"the four directions are visibly different and each ties back to a stated brand truth."}),
+E("Design Critique","Designer","Analyze","Website","Ranked findings with fixes",[10,13],{
+ r:"You are a principal UX designer giving a candid design review.",
+ o:"Review the design described below and tell me what to fix first.",
+ i:["Product and goal: [WHAT IT IS, THE TASK USERS MUST COMPLETE]","Audience: [WHO]","Design description or notes: [PASTE DESCRIPTION, LAYOUT, COPY]"],
+ p:["Restate the user's main task.","Assess clarity, hierarchy, accessibility (contrast, tap size, focus) and consistency.","List what works so I keep it.","Rank the top 5 problems by their impact on the main task and give one concrete fix each."],
+ k:["Tie every point to the user's task, not personal taste.","No fix without a specific change (what, where, to what)."],
+ f:"What works (3 bullets), Problems (table: rank, issue, why it matters, fix), Quick wins under 30 minutes.",
+ c:"the first problem listed is the one most likely to stop a user completing the main task."}),
+E("Interface Microcopy","Designer","Write","App","Constraints per item",[13,15],{
+ r:"You are a UX writer who writes interface text people understand at a glance.",
+ o:"Write all the text for the [SCREEN NAME] screen of [APP].",
+ i:["Screen purpose: [WHAT THE USER DOES HERE]","Tone: [TONE]","Possible errors: [LIST]","Max words per item: [N]"],
+ p:["Write the screen title and one helper line.","Write button labels as verb + object.","Write the empty state, a loading message, an error for each listed error (what happened and how to fix it) and a success message.","Offer one alternative for the primary button."],
+ k:["Plain words, no blame, no exclamation marks in errors.","Stay within the word limit."],
+ f:"Table: element, text, notes.",
+ c:"every error says what went wrong and what to do next."}),
+E("Design Tokens","Designer","Plan","App","Rules file for style decisions",[16,25],{
+ r:"You are a design-systems lead who defines tokens that engineers can paste straight into code.",
+ o:"Define a design token set for [PRODUCT] with a [MOOD WORDS] feel.",
+ i:["Audience: [AUDIENCE]","Brand colours if any: [HEX OR 'NONE']","Platforms: [WEB / ANDROID / BOTH]"],
+ p:["Choose 6 colour roles (background, surface, text, muted text, accent, danger) with light and dark values.","Check each text and background pair against WCAG AA and report the contrast ratios.","Define two font roles, a type scale, a spacing scale, and radius and shadow rules.","Output a table, then CSS custom properties."],
+ k:["No pure grey. Tint neutrals toward the accent.","Dark mode must be designed, not inverted."],
+ f:"Token table, contrast report, CSS variables block.",
+ c:"every foreground and background pair you list passes AA."}),
+E("Brand Voice Guide","Marketer","Write","Brand","Do and don't pairs with samples",[10,12],{
+ r:"You are a brand copy chief creating a voice guide a new writer could follow on day one.",
+ o:"Create a brand voice guide for [BRAND].",
+ i:["Brand and audience: [BRAND, AUDIENCE]","3 words that describe us: [WORDS]","Brands we sound like and unlike: [REFERENCES]","Sample of our current writing: [PASTE]"],
+ p:["Define 4 voice traits as 'we are / we are not' pairs.","Write 5 sample sentences in the voice across different contexts (website, support, social).","List 8 words to use and 8 to avoid.","Rewrite this line before and after: [SAMPLE LINE]."],
+ k:["Every trait needs a concrete example, not just an adjective.","Avoid contradictory traits."],
+ f:"Headed sections: Traits, Samples, Word lists, Before and After.",
+ c:"a stranger could tell on-voice from off-voice lines using only your guide."}),
+E("Landing Page Copy","Marketer","Write","Website","Audience, problem, objection",[10,3],{
+ r:"You are a conversion copywriter who puts clarity ahead of cleverness.",
+ o:"Write landing page copy for [PRODUCT] that makes [AUDIENCE] take this action: [ACTION].",
+ i:["Product: [WHAT IT IS AND DOES]","Audience and their problem: [AUDIENCE, PROBLEM]","Proof available: [TESTIMONIALS, NUMBERS, LOGOS]","Main objection: [OBJECTION]","Voice: [VOICE]"],
+ p:["State the promise in one sentence.","Write the hero: 3 headline options plus a subline, and recommend one.","Write 3 benefits (outcomes, not features), a 3-step how-it-works, a proof block, an objection-handling block and a closing call to action.","Cut every sentence over 18 words or explain why it stays."],
+ k:["Do not invent testimonials or statistics. Leave a [PROOF NEEDED] marker.","One call to action only."],
+ f:"Sections in page order with headings and final copy, then a short recommendation note.",
+ c:"the page reads clearly to someone who has never heard of the product and every claim is backed by supplied proof."}),
+E("LinkedIn Post","Marketer","Write","Content","Hook, story, takeaways, question",[10,22],{
+ r:"You are a LinkedIn ghostwriter who sounds like a thoughtful person, not a content machine.",
+ o:"Write a LinkedIn post about [TOPIC] for [AUDIENCE] that earns replies from the right people.",
+ i:["Core point: [ONE SENTENCE]","Real story or example: [SPECIFIC DETAIL FROM MY EXPERIENCE]","Desired action: [COMMENT / SAVE / VISIT]","My voice sample: [PASTE 2-3 SENTENCES]"],
+ p:["Write 3 hook options (first line, under 12 words) from different angles.","Draft the post around the strongest hook: the story, the lesson, 3 takeaways and a closing question.","Self-edit: remove filler openers, buzzwords and any line that could appear in anyone's post."],
+ k:["Under 1,300 characters.","Short paragraphs, plain words, no hashtags in the body, no emoji bullets.","Use only the story details I gave."],
+ f:"Hooks (3), Final post, one line on why that hook was chosen.",
+ c:"a reader could tell this came from one specific person, not a template."}),
+E("7-Day Content Plan","Marketer","Plan","Content","Balanced content mix in a table",[10,22],{
+ r:"You are a content strategist planning a week that builds trust before it asks for anything.",
+ o:"Plan 7 days of [PLATFORM] content for [BRAND].",
+ i:["Theme: [THEME]","Audience: [AUDIENCE]","Offer to support: [OFFER]","Time I have per day: [MINUTES]","My strengths: [e.g. video, writing, design]"],
+ p:["Choose 3 content pillars from the theme.","Mix the week: 2 educational, 2 story, 1 proof, 1 community, 1 offer.","For each day give the format, hook, key point, call to action and asset needed.","Order the week so the offer lands on day 6 or 7, after trust is built."],
+ k:["Each day must fit my time budget.","No two consecutive days in the same pillar."],
+ f:"Table: day, pillar, format, hook, key point, CTA, asset, time needed.",
+ c:"the plan fits my time and the offer post is supported by the posts before it."}),
+E("One Idea, Five Formats","Marketer","Write","Content","Same message, different form",[10,22],{
+ r:"You are a multi-format content editor who adapts one idea without changing its meaning.",
+ o:"Turn the idea below into five formats.",
+ i:["Core idea: [IDEA IN 2-3 SENTENCES]","Audience: [AUDIENCE]","Proof or example to include: [DETAIL]","Call to action: [CTA]"],
+ p:["State the core message in one sentence that must stay identical across formats.","Create: a short social post, a LinkedIn post, a 30-second video script, a 6-slide carousel outline and a newsletter intro.","Adapt the hook, length and structure to each format.","Check that the core message survives in each."],
+ k:["Same message, different form. No new claims per format.","Respect the typical length of each format."],
+ f:"Five labelled sections, each ready to publish with minimal editing.",
+ c:"a reader of any one format would state the same core message."}),
+E("Audience Persona","Marketer","Analyze","General","Mark inference vs knowledge",[10,6],{
+ r:"You are a market researcher who builds personas from evidence, not stereotypes.",
+ o:"Build a working persona of [AUDIENCE] for [BRAND OR PRODUCT].",
+ i:["Audience: [WHO]","What I know for sure: [FACTS FROM CUSTOMERS OR DATA]","Product: [WHAT IT SOLVES]"],
+ p:["List their goals, frustrations and current workarounds.","Describe where they look for help and whom they trust.","Write the exact words they use to describe the problem.","State what would make them trust us and what would make them leave.","Mark every item as 'known' (from my facts) or 'inferred'."],
+ k:["No made-up statistics.","Avoid demographic caricature. Focus on situation and motivation."],
+ f:"One-page persona with a Known or Inferred tag on each line, then 5 interview questions to validate the inferred items.",
+ c:"inferred items are clearly separated and each has a validating question."}),
+E("Positioning Statement","Founder","Plan","Brand","Fill-in positioning frame",[10],{
+ r:"You are a positioning strategist.",
+ o:"Write a positioning statement that makes it obvious why [PRODUCT] exists.",
+ i:["Target customer: [WHO]","Need: [PROBLEM]","Category: [CATEGORY]","Key benefit: [BENEFIT]","Alternatives people use today: [ALTERNATIVES]","Real difference: [DIFFERENCE]"],
+ p:["Fill the frame: For [target] who [need], [product] is a [category] that [benefit]. Unlike [alternative], we [difference].","Write 3 versions: safe, sharper, boldest.","Stress-test each: could a competitor say the same? Rewrite if yes.","Recommend one and give a plain-language tagline."],
+ k:["No filler words like 'innovative', 'seamless' or 'solution'.","The difference must be provable."],
+ f:"3 versions, a stress-test table (version, could a competitor claim it, why), a recommendation and a tagline.",
+ c:"the chosen version names something a competitor could not honestly claim."}),
+E("Offer Tiers","Founder","Plan","General","Structured options with logic",[6,10],{
+ r:"You are a pricing strategist who designs simple, defensible offers.",
+ o:"Design 3 tiers for [PRODUCT OR SERVICE].",
+ i:["Audience: [WHO]","Delivery cost or effort per customer: [COST OR HOURS]","Currency and market: [CURRENCY, REGION]","Price anchors (competitors or alternatives): [LIST]","Business goal: [e.g. cash now / recurring revenue]"],
+ p:["Define the value ladder: what changes between tiers (not just 'more').","Name the tiers and set a price range for each with the logic.","List inclusions, exclusions and the ideal customer per tier.","Identify the upgrade trigger and one risk for each tier."],
+ k:["Make the middle tier the obvious best fit.","No tier without a reason for its price."],
+ f:"Comparison table plus a 4-line pricing rationale.",
+ c:"each tier is clearly different in outcome and the prices respect the cost I provided."}),
+E("Product Requirements","Founder","Plan","App","Requirements prompt with open questions",[18,16],{
+ r:"You are a senior product manager writing a requirements document that engineers can build from.",
+ o:"Write a product requirements document (PRD) for [APP NAME].",
+ i:["Purpose: [ONE-LINE PURPOSE]","Users: [WHO]","Core problem: [PROBLEM]","Constraints: [BUDGET, TIME, PLATFORM, TEAM]","Known must-haves: [LIST]"],
+ p:["List open questions first and wait for answers if any are critical.","Write: problem, users and jobs-to-be-done, goals and non-goals, success metrics.","Specify features as must / should / could, each with acceptance criteria.","Describe the main flow step by step, then edge cases and error states.","Add data, permissions and analytics events.","End with risks and open questions."],
+ k:["Every feature has at least one testable acceptance criterion.","Non-goals are explicit."],
+ f:"Numbered PRD sections, with tables for features and metrics.",
+ c:"an engineer could estimate the work without asking me anything except the listed open questions."}),
+E("User Stories","Founder","Plan","App","Stories with acceptance criteria",[19,18],{
+ r:"You are an agile coach who writes stories that are small, testable and independent.",
+ o:"Convert the feature list into user stories.",
+ i:["Features: [LIST]","Users and roles: [ROLES]","Definition of done: [e.g. tested on mobile, accessible]"],
+ p:["Group the features into epics.","Write each story as: As a [role], I want [action] so that [benefit].","Add 3 acceptance criteria per story in Given / When / Then form.","Flag stories too big for one sprint and split them.","Order the backlog by value and dependency."],
+ k:["One behaviour per story.","Acceptance criteria must be testable by someone who did not write them."],
+ f:"Epic headings with stories and criteria under each, then the final ordered backlog list.",
+ c:"no story joins two separate behaviours with 'and'."}),
+E("Compare Options","Founder","Analyze","General","Scored comparison table",[4,6],{
+ r:"You are a decision analyst who values clear criteria over opinions.",
+ o:"Compare the options and recommend one.",
+ i:["Options: [OPTION A], [OPTION B], [OPTION C]","Goal: [WHAT I AM TRYING TO ACHIEVE]","Criteria and weights: [CRITERION (weight 1-5), ...]","Constraints: [BUDGET, TIME, SKILLS]"],
+ p:["Confirm or refine the criteria.","Score each option 1-5 per criterion with a one-line reason.","Calculate the weighted totals.","Recommend one, name the biggest risk and say what would change your mind."],
+ k:["Show your scoring so I can disagree with a specific number.","Say 'unknown' when evidence is missing."],
+ f:"Scoring table with totals, recommendation, risk, reversal condition.",
+ c:"the arithmetic is correct and the recommendation follows from the scores or explains why not."}),
+E("Pre-Mortem","Founder","Analyze","General","Imagine failure first",[4],{
+ r:"You are a skeptical risk analyst running a pre-mortem.",
+ o:"Assume [PROJECT] failed within [TIMEFRAME] and explain why.",
+ i:["Project: [DESCRIPTION]","Team and resources: [WHO, HOW MUCH]","Key dates: [DEADLINES]"],
+ p:["List 7 specific reasons it failed, across people, product, market, money and timing.","Rate each by likelihood and impact (1-5).","For each, give the early warning sign and one preventive action for this week.","Identify the top 2 risks to handle first."],
+ k:["No generic risks like 'poor communication'. Be specific to this project.","Do not reassure me."],
+ f:"Table: risk, likelihood, impact, early warning, prevention. Then the top 2 priorities.",
+ c:"each risk is specific enough that I could assign an owner to it."}),
+E("Notes to Actions","Founder","Analyze","General","Extract, don't guess",[0,2],{
+ r:"You are an executive assistant who turns messy notes into clean follow-ups.",
+ o:"Extract the decisions, actions, open questions and risks from the notes.",
+ i:["Meeting or topic: [NAME]","People involved: [NAMES]","Date: [DATE]"],
+ b:"<notes>\n[PASTE NOTES]\n</notes>",
+ p:["Extract the decisions (what was decided and by whom).","Extract action items with owner and deadline. Write '?' where either is missing.","List open questions and risks.","Draft a 5-line follow-up message for the attendees."],
+ k:["Do not guess owners or dates.","Quote ambiguous lines instead of interpreting them."],
+ f:"Sections: Decisions, Actions (table: action, owner, due), Open questions, Risks, Follow-up message.",
+ c:"every action traces to a line in the notes."}),
+E("Workshop Agenda","Founder","Plan","Course","Timed plan with materials",[8],{
+ r:"You are a facilitator who designs workshops people leave energized.",
+ o:"Plan a [DURATION] workshop on [TOPIC].",
+ i:["Audience and size: [WHO, NUMBER]","Their starting level: [LEVEL]","Outcome by the end: [OUTCOME]","Format: [IN PERSON / ONLINE]","Materials available: [LIST]"],
+ p:["State the outcome as 'participants will be able to...'.","Build a timed agenda with an opener, teaching blocks (15 minutes maximum), activities and breaks.","For each activity give instructions, timing and materials.","Add a closing action step and feedback questions."],
+ k:["Participants speak or act at least every 15 minutes.","Include a fallback if time runs short."],
+ f:"Timed table: time, segment, method, materials. Then facilitator notes and a feedback form.",
+ c:"the timings add up to the stated duration."}),
+E("Tech Stack Choice","Developer","Plan","App","Compare, recommend, name the risk",[20,23],{
+ r:"You are a staff engineer who advises on pragmatic technology choices.",
+ o:"Recommend a tech stack for [APP].",
+ i:["App summary: [WHAT IT DOES]","Users and scale: [EXPECTED USERS]","Team skills: [LANGUAGES, FRAMEWORKS]","Budget: [MONTHLY LIMIT]","Deadline: [DATE]","Must-integrate: [SERVICES]"],
+ p:["Restate the technical requirements and non-negotiables.","Propose 3 stacks.","Compare them on speed to build, cost, scaling, learning curve and lock-in.","Recommend one, state its biggest risk and a mitigation, and say when I should revisit the choice."],
+ k:["Prefer boring, proven tools unless a requirement says otherwise.","Include real monthly cost estimates with your assumptions."],
+ f:"Comparison table, recommendation, risk and mitigation, 'revisit when' triggers.",
+ c:"the recommendation fits my team's skills and budget, not just technical merit."}),
+E("Spec Before Code","Developer","Plan","App","Requirements, design, tasks, then build",[19,18],{
+ r:"You are a staff engineer who writes specs before touching code.",
+ o:"Produce a requirements, design and task plan for [FEATURE], then stop for approval.",
+ i:["Feature: [FEATURE]","Existing stack and conventions: [STACK, RULES]","Constraints: [PERFORMANCE, SECURITY, DEADLINE]"],
+ p:["Requirements: user stories and acceptance criteria.","Design: components, data model, APIs, state and error handling. Note alternatives you rejected.","Tasks: an ordered list, each small enough for one commit and each with a test.","Risks and open questions."],
+ k:["Write no implementation code in this step.","Do not proceed until I reply 'approved'."],
+ f:"Three headed documents (Requirements, Design, Tasks), then the words 'Waiting for approval'.",
+ c:"every requirement maps to at least one task and one test."}),
+E("Project Rules File","Developer","Plan","App","Persistent rules for AI editors",[25,21,24],{
+ r:"You are a tech lead writing the rules file an AI coding assistant must follow.",
+ o:"Write a rules file for [PROJECT].",
+ i:["Stack: [STACK]","Folder structure: [STRUCTURE OR 'PROPOSE']","Style conventions: [LINTER, FORMAT, NAMING]","Commands: [RUN, TEST, BUILD]"],
+ p:["Describe the project in 3 lines.","Define the folder structure and naming conventions.","Define coding standards, error handling and testing expectations.","List things the AI must never do (e.g. edit migrations, add dependencies without asking).","State when the AI must ask me before acting."],
+ k:["Each rule must be specific and checkable.","Keep it under 120 lines."],
+ f:"A markdown file with sections: Overview, Structure, Standards, Testing, Never do, Ask first.",
+ c:"each rule can be verified by looking at a diff."}),
+E("Context Pack","Developer","Plan","General","Reusable context at the top of a chat",[16,17],{
+ r:"You are a technical writer who compresses project context for AI assistants.",
+ o:"Write a context pack I can paste at the start of any chat about [PROJECT].",
+ i:["Project: [NAME AND PURPOSE]","Users: [WHO]","Decisions already made: [LIST]","Constraints: [LIST]","Style rules: [LIST]","Current status and next step: [TEXT]"],
+ p:["Organize into: Goal, Users, Constraints, Decisions (with reasons), Style, Current status, Definition of done.","Cut anything an assistant could not act on.","Add a closing line telling the assistant to ask before assuming."],
+ k:["Under 300 words.","Facts only. No marketing language."],
+ f:"One pasteable block, followed by a list of what to update each week.",
+ c:"a fresh assistant could continue the work using only this block."}),
+E("API Design","Developer","Plan","App","Decisions flagged for the owner",[20,23],{
+ r:"You are an API architect who designs interfaces that are simple to use and hard to misuse.",
+ o:"Design a REST API for [APP].",
+ i:["Core resources: [LIST]","Clients: [WEB, MOBILE, THIRD PARTY]","Auth model: [SESSION / JWT / API KEY / UNSURE]","Scale and constraints: [NOTES]"],
+ p:["List the resources and their relationships.","Define endpoints (method, path, purpose) with request and response examples.","Define pagination, filtering, the error format and status codes.","Specify authentication, authorization and rate limits.","Flag decisions that need my input."],
+ k:["Consistent naming with plural nouns.","Never expose internal IDs or fields the client does not need."],
+ f:"Resource list, endpoint table, JSON examples, error schema, open decisions.",
+ c:"every endpoint has a clear owner role and a documented failure case."}),
+E("System Prompt Writer","Developer","Write","App","Role, limits, examples",[13,14,15],{
+ r:"You are a prompt engineer who writes production system prompts.",
+ o:"Write a system prompt for an assistant that [PURPOSE] for [USERS].",
+ i:["Purpose: [WHAT IT DOES]","Users: [WHO]","Tone: [TONE]","Knowledge sources: [DOCS, TOOLS]","Hard limits: [WHAT IT MUST NEVER DO]","Hand-off rule: [WHEN TO ESCALATE]"],
+ p:["Write these sections: Role, Goals, Tone, Knowledge and tools, Behaviour rules, Refusals and limits, Escalation, Output format.","Handle unclear requests by asking one clarifying question.","Include 3 short example exchanges (normal, unclear, out of scope).","List 5 test inputs I should try."],
+ k:["Be specific and positive: say what to do, not only what not to do.","No contradictory rules."],
+ f:"System prompt in a code block, example exchanges, test inputs.",
+ c:"the prompt covers every hard limit I listed and defines what to do when the answer is unknown."}),
+E("Code Review","Developer","Analyze","General","Ranked findings with quoted lines",[20,24],{
+ r:"You are a senior engineer doing a careful, constructive code review.",
+ o:"Review the code for correctness, security, readability and performance.",
+ i:["Language and framework: [STACK]","What the code should do: [PURPOSE]","Areas of most concern: [e.g. security, speed]"],
+ b:"<code>\n[PASTE CODE]\n</code>",
+ p:["Summarize what the code does in 2 lines to confirm you understood it.","Look for bugs and security issues first.","Then look at readability, structure and performance.","For each finding give the severity, location, why it matters and a minimal fix."],
+ k:["Quote the exact line.","Do not rewrite the whole file. Prefer small patches.","Say 'no issues found' for a category rather than inventing issues."],
+ f:"Table: severity, line, issue, fix. Then 'Top 3 to fix now'.",
+ c:"every high-severity item includes a concrete reason it can fail."}),
+E("Debug With Evidence","Developer","Debug","App","Hypotheses ranked by probability",[23,21],{
+ r:"You are a methodical debugging partner who forms hypotheses and tests them.",
+ o:"Find and fix the cause of the bug below.",
+ i:["Expected behaviour: [WHAT SHOULD HAPPEN]","Actual behaviour: [WHAT HAPPENS]","Steps to reproduce: [STEPS]","Error message or logs: [PASTE]","Environment: [OS, VERSIONS]","Recent changes: [WHAT CHANGED]"],
+ b:"<code>\n[PASTE RELEVANT CODE]\n</code>",
+ ask:false,
+ p:["Summarize the evidence. Do not propose a fix yet. If a specific log or file is missing, ask for it.","List 3 hypotheses ranked by probability, each with the quickest test to confirm it.","If a test needs me to run something, wait for my result. Otherwise proceed.","Give the smallest fix for the confirmed cause and explain why it works.","Suggest a regression test."],
+ k:["Do not change unrelated code.","Never claim a fix works without saying how to verify it."],
+ f:"Evidence summary, Hypotheses table, Fix (diff), Regression test.",
+ c:"the fix addresses the cause, not just the symptom."}),
+E("Test Writer","Developer","Write","App","Cases that prove behaviour",[23,24],{
+ r:"You are a test engineer who writes tests that prove behaviour and catch regressions.",
+ o:"Write tests for the code below using [FRAMEWORK].",
+ i:["Framework: [JEST / PYTEST / OTHER]","Behaviour that matters most: [LIST]","Known bugs or edge cases: [LIST]"],
+ b:"<code>\n[PASTE CODE]\n</code>",
+ p:["List the behaviours to test.","Write tests for normal cases, boundaries, invalid input and failures.","Name each test so it reads as a sentence.","Note anything untestable without refactoring."],
+ k:["One idea per test.","No tests that merely mirror the implementation."],
+ f:"The test file in a code block, then a coverage table: behaviour, test name.",
+ c:"each listed behaviour has at least one test and a failure would be meaningful."}),
+E("Safe Refactor","Developer","Improve","App","Small steps, tests as proof",[20,23],{
+ r:"You are a refactoring specialist who never changes behaviour by accident.",
+ o:"Refactor the code for readability and maintainability without changing behaviour.",
+ i:["Goals: [e.g. smaller functions, clearer names]","Tests available: [YES / NO]","Constraints: [e.g. public API must not change]"],
+ b:"<code>\n[PASTE CODE]\n</code>",
+ p:["Describe the current structure and its problems.","Plan the refactor steps in order of safety.","Apply them one at a time, explaining each in one line.","State which tests or manual checks prove behaviour is unchanged."],
+ k:["No new features.","Keep public interfaces identical unless I approve a change."],
+ f:"Plan, refactored code, a step-by-step change log and a verification checklist.",
+ c:"you can point to evidence that behaviour is unchanged at each step."}),
+E("README Writer","Developer","Write","App","Docs grounded in the code",[24,13],{
+ r:"You are a developer advocate who writes READMEs people actually finish.",
+ o:"Write the README for [PROJECT].",
+ i:["What it does: [ONE SENTENCE]","Who it is for: [AUDIENCE]","Install and run steps: [STEPS OR 'INFER FROM CODE']","License: [LICENSE]"],
+ b:"<code>\n[PASTE KEY FILES OR FOLDER STRUCTURE]\n</code>",
+ p:["Write a one-sentence description and a short 'why' paragraph.","Add install, a quick start with a working example, configuration and usage.","Add contributing, testing and license.","Mark any step you inferred as 'verify'."],
+ k:["Treat the code as the source of truth.","Every command must be copy-pasteable."],
+ f:"A complete README in markdown.",
+ c:"a new developer could run the project in under 5 minutes using only the README."}),
+E("Explain This Code","Developer","Learn","General","Walk through, then summarize",[8,5],{
+ r:"You are a patient senior developer mentoring a teammate.",
+ o:"Explain the code so I can maintain it.",
+ i:["My level: [BEGINNER / INTERMEDIATE]","Language: [LANGUAGE]","What I need to do with it: [CHANGE, DEBUG, REUSE]"],
+ b:"<code>\n[PASTE CODE]\n</code>",
+ p:["Give a 3-line overview of the purpose.","Walk through the code block by block, explaining what and why.","Identify the 3 riskiest parts to change.","Suggest 2 safe small changes I can try in order to learn it."],
+ k:["Define terms the first time you use them.","Quote the lines you discuss."],
+ f:"Overview, walkthrough, risks, practice changes.",
+ c:"each block's explanation matches what the code actually does."}),
+E("Prompt Test Cases","Developer","Improve","General","Eval cases before shipping a prompt",[26,27],{
+ r:"You are an evaluation engineer who stress-tests prompts before they ship.",
+ o:"Create a test suite for the prompt below and suggest improvements.",
+ i:["Task the prompt must perform: [TASK]","Success criteria: [WHAT A GOOD OUTPUT LOOKS LIKE]","Known failure modes: [LIST]"],
+ b:"<prompt>\n[PASTE PROMPT]\n</prompt>",
+ p:["Extract the prompt's promises (what it claims to do).","Create 12 test inputs: 5 typical, 4 edge cases, 3 adversarial.","For each, give the expected behaviour and a pass or fail rule.","Predict where the prompt will most likely fail.","Suggest 3 concrete edits to the prompt."],
+ k:["Pass and fail rules must be checkable without opinion.","Include at least one input with missing information."],
+ f:"Table: id, input, expected behaviour, pass rule. Then predicted failures and edits.",
+ c:"a different person could grade outputs using only your table."}),
+E("Course Outline","Writer","Plan","Course","Outcome per session",[1,8],{
+ r:"You are an instructional designer who builds courses around outcomes.",
+ o:"Design a [N]-session course on [TOPIC].",
+ i:["Audience: [WHO]","Starting level: [LEVEL]","Final outcome: [WHAT THEY CAN DO AT THE END]","Session length: [MINUTES]","Delivery: [LIVE / SELF-PACED]"],
+ p:["Write the course promise in one sentence.","Break it into sessions, each with an outcome, 3 sections, an activity and a take-home task.","Add the final project and a rubric with 4 criteria.","Check that the session outcomes build toward the final outcome."],
+ k:["Outcomes use action verbs (build, compare, write).","No session covers more than it can teach in the time."],
+ f:"Course promise, session table, final project, rubric.",
+ c:"removing any session would leave a gap in the final outcome."}),
+E("Lesson Script","Writer","Write","Course","Hook, teach, check, recap",[1,5],{
+ r:"You are an engaging teacher who writes scripts to be spoken aloud.",
+ o:"Write a [N]-minute lesson script on [TOPIC].",
+ i:["Audience: [WHO]","Learning outcome: [OUTCOME]","Examples they relate to: [CONTEXT]","Format: [VIDEO / LIVE / PODCAST]"],
+ p:["Open with a hook (a question, story or problem).","Teach 3 points, each with an example and a plain-language summary.","Insert one check question after the second point.","Recap and give a next step."],
+ k:["Spoken language: short sentences, no jargon read aloud.","Mark the timing every 2 minutes."],
+ f:"Script with timestamps, speaker cues in brackets and on-screen text suggestions.",
+ c:"the script fits the time at about 130 words per minute."}),
+E("Article Outline","Writer","Plan","Content","Thesis first",[10,12],{
+ r:"You are an editor who builds the argument before the words.",
+ o:"Outline an article titled '[TITLE]' for [AUDIENCE].",
+ i:["Reader problem: [WHAT THEY WANT TO SOLVE]","Your angle: [WHAT YOU BELIEVE THAT OTHERS DON'T]","Evidence or experience you can use: [LIST]","Length: [WORDS]"],
+ p:["State the thesis in one sentence.","Outline 5 sections with the point of each and the evidence to use.","Suggest an opening scene and a closing call to action.","List the claims that need sources."],
+ k:["Each section must advance the thesis.","Cut anything that is only background."],
+ f:"Thesis, outline with word budgets, opening, closing, source list.",
+ c:"the word budgets add up to the target length."}),
+E("Edit My Draft","Writer","Improve","Content","Edit, then explain the edits",[10,12],{
+ r:"You are a line editor who improves writing while preserving the author's voice.",
+ o:"Edit my draft for clarity, flow and impact.",
+ i:["Audience: [WHO]","Goal of the piece: [WHAT IT SHOULD ACHIEVE]","Voice notes: [e.g. warm, direct]","Do not change: [NAMES, QUOTES, CLAIMS]"],
+ b:"<draft>\n[PASTE DRAFT]\n</draft>",
+ p:["Diagnose the 3 biggest problems in structure and clarity.","Edit the draft, keeping my voice and facts.","List the 5 most important changes with reasons.","Flag claims that need a source."],
+ k:["Do not add new claims.","Tighten. Do not pad."],
+ f:"Diagnosis, revised draft, change list, claims to verify.",
+ c:"the revised draft is no longer than the original and is clearer at every paragraph opening."}),
+E("Headline Generator","Writer","Write","Content","Quota per angle",[10],{
+ r:"You are a headline writer who respects the reader.",
+ o:"Write headlines for [CONTENT].",
+ i:["Content summary: [SUMMARY]","Audience: [WHO]","Promise or payoff: [WHAT THE READER GETS]","Platform: [WHERE IT APPEARS]"],
+ p:["Write 12 headlines: 3 curiosity, 3 benefit-led, 3 contrarian, 3 how-to.","Keep each under 70 characters.","Score each 1-5 for clarity, specificity and pull.","Pick the top 2, say why, and flag any that overpromise."],
+ k:["No clickbait the content cannot deliver.","Use concrete numbers only if they are true."],
+ f:"Table: type, headline, scores. Then the top 2.",
+ c:"each headline is accurate to the content."}),
+E("Story Structure","Writer","Plan","Content","Beats from tension to takeaway",[10,12],{
+ r:"You are a story editor.",
+ o:"Structure a story about [SUBJECT] that makes this point: [POINT].",
+ i:["Audience: [WHO]","Facts and details I have: [LIST]","Length and medium: [e.g. 600-word article, 3-minute talk]","Feeling to leave them with: [FEELING]"],
+ p:["Identify the central tension.","Outline the opening scene, escalating tension, turning point, resolution and takeaway.","Place my facts in the outline and mark the gaps.","Write the one line I want them to remember."],
+ k:["Use only facts I provided. Mark gaps as [NEED DETAIL].","The point must emerge from the story, not be announced at the start."],
+ f:"Beat sheet, gap list, memorable line.",
+ c:"every beat moves toward the point."})
+];
+
+var ROLES=["Designer","Developer","Marketer","Founder","Student","Writer"];
+var TASKS=["Plan","Write","Analyze","Improve","Learn","Debug"];
+var PROJECTS=["App","Website","Brand","Content","Course","General"];
+
+/* ---------- Section 2: goal sequences ---------- */
+function S(title,why,spec){return [title,why,spec];}
+var GOALS=[
+{n:"Turn a raw idea into a clear brief",d:"Stop explaining the same idea twice.",steps:[
+ S("Say it plainly","Gets the idea out of your head and exposes the gaps.",{
+  r:"You are a product strategist who clarifies ideas before anyone builds them.",
+  o:"Turn my raw idea into a clear problem statement and surface what is missing.",
+  i:["Raw idea: [YOUR IDEA]","Who I think it is for: [AUDIENCE OR 'NOT SURE']"],ask:false,
+  p:["Restate the idea as: problem, audience, proposed solution, why now.","List the 5 questions that must be answered before anyone could build it. Number them, then stop and wait."],
+  k:["Do not suggest features yet."],
+  f:"Restatement (4 labeled lines), then the numbered questions.",
+  c:"the questions target real gaps, not trivia."}),
+ S("Answer and tighten","Your answers sharpen the idea and expose contradictions.",{
+  r:"You are a critical product strategist.",
+  o:"Tighten the idea using my answers and challenge it.",
+  i:["My answers: [ANSWER EACH NUMBERED QUESTION]"],ask:false,
+  p:["Update the restatement using my answers.","Point out contradictions and weak assumptions.","Name the one assumption to test first and the cheapest way to test it."],
+  f:"Updated summary, issues list, first test.",
+  c:"every issue you raise cites something I said."}),
+ S("Draw the scope line","Prevents a bloated first version.",{
+  r:"You are a pragmatic product manager.",
+  o:"Decide what version 1 includes and what waits.",
+  i:["Time and resources: [TIME, TEAM, BUDGET]"],ask:false,
+  p:["Sort candidate features into must-have, should-have and not-now.","Limit must-haves to 5 and justify each in one line.","Explain each cut in one line."],
+  f:"Three lists with one-line justifications.",
+  c:"the must-haves alone deliver the core outcome."}),
+ S("Write the brief","One page you can paste into any chatbot.",{
+  r:"You are a technical writer.",
+  o:"Write a one-page brief I can paste as context into any chat.",ask:false,
+  p:["Compile: goal, audience, scope, constraints, success measure, risks, open questions.","Keep it under 300 words and use plain facts."],
+  f:"One pasteable block, followed by a list of what to update as the idea evolves.",
+  c:"a stranger could act on the brief without asking questions."})
+]},
+{n:"Launch a landing page",d:"From offer to published copy and code.",steps:[
+ S("Pin down audience and offer","Everything else depends on this.",{
+  r:"You are a positioning strategist.",
+  o:"Define who the page is for and what we promise.",
+  i:["Product: [WHAT IT IS]","Audience: [WHO]","Problem: [PROBLEM]","Proof I can show: [TESTIMONIALS, NUMBERS, LOGOS]"],
+  p:["State in one sentence each: who it is for, the problem, the promise, the proof.","Identify the audience's biggest objection."],
+  f:"Four labeled lines plus the objection.",
+  c:"the promise is specific and provable."}),
+ S("Plan the page structure","Sections before words.",{
+  r:"You are a conversion strategist.",
+  o:"Plan the page so each section has one job.",ask:false,
+  p:["Propose the section order (hero, problem, solution, how it works, proof, objections, call to action).","State what each section must make the visitor believe or do."],
+  f:"Table: section, job, key message, proof used.",
+  c:"the order answers the visitor's questions in the order they arise."}),
+ S("Write the copy","Headlines first, then body.",{
+  r:"You are a conversion copywriter.",
+  o:"Write the full page copy.",
+  i:["Voice: [VOICE]"],ask:false,
+  p:["Write 3 hero headline options and a subline, then recommend one.","Write every section using the structure above.","Keep sentences under 18 words."],
+  k:["Do not invent proof. Use [PROOF NEEDED] where something is missing.","One call to action only."],
+  f:"Final copy by section.",
+  c:"every claim is backed by the proof I provided."}),
+ S("Build it","Turns copy into a working page.",{
+  r:"You are a front-end developer who ships accessible, fast pages.",
+  o:"Build the page as a single responsive HTML file.",
+  i:["Colours: [COLOURS]","Fonts: [FONTS]","Call to action link: [URL OR 'PLACEHOLDER']"],ask:false,
+  p:["Use the approved copy exactly.","Mobile-first layout, semantic HTML, WCAG AA contrast, visible focus states.","No external dependencies except fonts."],
+  f:"One complete HTML file in a code block.",
+  c:"the page works at 360px wide and has no horizontal scroll."}),
+ S("Review and tighten","A second pair of eyes.",{
+  r:"You are a skeptical first-time visitor and a conversion reviewer.",
+  o:"Audit the page and tell me what to change.",ask:false,
+  p:["List what is unclear, what feels unproven and where a visitor would hesitate.","Give the 5 edits that would raise sign-ups most, in order."],
+  f:"Table: issue, why it hurts conversion, exact fix.",
+  c:"each edit is specific enough to apply in minutes."})
+]},
+{n:"Build an app MVP",d:"Plan first, then build in small steps.",steps:[
+ S("Define users and problem","Keeps the build honest.",{
+  r:"You are a product manager.",
+  o:"Define the problem, the user and the single most important outcome.",
+  i:["App idea: [APP]","Users: [USERS]","Problem: [PROBLEM]","Platform: [WEB / ANDROID / BOTH]"],
+  p:["Ask up to 5 questions, then wait.","After my answers, write a half-page summary of the problem, users and the one outcome the MVP must deliver."],
+  f:"Questions first. Then the summary.",
+  c:"the outcome is measurable."}),
+ S("Features and main flow","The smallest useful version.",{
+  r:"You are a product designer.",
+  o:"Define the smallest version that delivers the outcome.",ask:false,
+  p:["List 5 must-have features.","Describe the main user flow screen by screen.","Name what we are deliberately leaving out."],
+  f:"Feature list, flow (numbered), exclusions.",
+  c:"the flow completes the core outcome with no unlisted feature."}),
+ S("Data and stack","Decide before coding.",{
+  r:"You are a staff engineer.",
+  o:"Propose a data model and a tech stack.",
+  i:["Platform: [WEB / ANDROID / BOTH]","Constraints: [BUDGET, SKILLS, DEADLINE]"],ask:false,
+  p:["Propose the data model: tables, fields, relationships.","Compare two stacks and recommend one, with its biggest risk."],
+  f:"Data model table, stack comparison, recommendation.",
+  c:"the data model supports every must-have feature."}),
+ S("Ordered build plan","Each task testable.",{
+  r:"You are a tech lead.",
+  o:"Turn the design into an ordered build plan.",ask:false,
+  p:["List the tasks in build order, each small enough for one commit.","Give each task a finish line and a test.","Stop and wait for my approval."],
+  f:"Numbered task list with finish line and test for each.",
+  c:"no task depends on a later task."}),
+ S("Build step one","Start small and verify.",{
+  r:"You are a senior developer who works in small verified steps.",
+  o:"Build task 1 only.",ask:false,
+  p:["Show the files you create or change.","Explain how to run and verify it.","Wait for my 'continue' before task 2."],
+  k:["Do not build ahead.","Do not add dependencies without telling me."],
+  f:"Files changed, run instructions, verification steps.",
+  c:"I can run it and see the result described."})
+]},
+{n:"Write a week of social posts",d:"Seven days planned, drafted, in your voice.",steps:[
+ S("Choose pillars","Three themes you can sustain.",{
+  r:"You are a content strategist.",
+  o:"Define 3 content pillars I can sustain.",
+  i:["Platform: [PLATFORM]","Who I am: [ROLE AND EXPERTISE]","Audience: [AUDIENCE]","Goal: [WHAT THE CONTENT SHOULD LEAD TO]"],
+  p:["Suggest 3 pillars that connect my expertise to the audience's needs.","Give 3 post ideas for each."],
+  f:"Table: pillar, why it fits, 3 post ideas.",
+  c:"each pillar is distinct and sustainable for 3 months."}),
+ S("Build the calendar","A table you can follow.",{
+  r:"You are a content planner.",
+  o:"Plan 7 days using the pillars.",ask:false,
+  p:["Mix education, story, proof and one offer.","For each day give the format, hook, key point and call to action."],
+  f:"Table: day, pillar, format, hook, key point, CTA.",
+  c:"the offer post comes after trust-building posts."}),
+ S("Draft the posts","Full text, ready to edit.",{
+  r:"You are a ghostwriter who matches the author's voice.",
+  o:"Draft all 7 posts.",
+  i:["Length limit: [LENGTH]","Voice sample: [PASTE 2-3 SENTENCES]"],ask:false,
+  p:["Start each post with a one-line hook.","End each with a question or call to action.","Use only details from my own experience where a story is needed; mark gaps with [NEED DETAIL]."],
+  f:"Seven posts, labelled by day.",
+  c:"no post could belong to anyone else."}),
+ S("Edit for voice","Remove generic phrasing.",{
+  r:"You are an editor who removes template language.",
+  o:"Rewrite lines that sound generic.",
+  i:["My specific details to use: [YOUR EXPERIENCES, NUMBERS, NAMES]"],ask:false,
+  p:["Flag lines that sound generic or like a template.","Rewrite them with my specifics."],
+  f:"List: original line, rewritten line.",
+  c:"each rewrite adds a concrete detail."})
+]},
+{n:"Learn a topic fast",d:"Map it, learn it, test it.",steps:[
+ S("Map the topic","See the whole territory.",{
+  r:"You are a learning coach.",
+  o:"Map [TOPIC] so I know what to learn and in what order.",
+  i:["Topic: [TOPIC]","Purpose: [PURPOSE]","Time available: [TIME]","What I already know: [PRIOR KNOWLEDGE]"],
+  p:["List the 5 core ideas.","Order them for learning.","State what I can safely ignore for now."],
+  f:"Numbered map with one-line description of each idea and what to skip.",
+  c:"the order respects prerequisites."}),
+ S("Teach the first idea","Concept, analogy, example.",{
+  r:"You are a patient tutor.",
+  o:"Teach me idea 1.",ask:false,
+  p:["Define it in one sentence.","Give an analogy from something I know.","Walk through a worked example.","List 2 common mistakes."],
+  f:"Four short sections.",
+  c:"a beginner can follow it."}),
+ S("Practice","Active recall beats rereading.",{
+  r:"You are an examiner.",
+  o:"Give me practice on idea 1.",ask:false,
+  p:["Ask 5 questions, increasing in difficulty.","Wait for my answers before revealing any solutions."],
+  f:"Questions only; solutions after I reply.",
+  c:"the questions test understanding, not memory of wording."}),
+ S("Test and plan next","Find the gaps.",{
+  r:"You are a learning coach.",
+  o:"Assess my answers and plan the next week.",ask:false,
+  p:["List my weak spots with evidence from my answers.","Build a 7-day plan with 30-minute daily sessions."],
+  f:"Weak-spot table, 7-day plan.",
+  c:"each day has one clear task."})
+]},
+{n:"Create a brand identity",d:"Strategy first, visuals second.",steps:[
+ S("Interview me","Purpose, audience, personality.",{
+  r:"You are a senior brand strategist.",
+  o:"Interview me about [BRAND].",
+  i:["Brand: [NAME]","What it offers: [PRODUCT OR SERVICE]"],ask:false,
+  p:["Ask 5 questions at a time.","Cover purpose, audience, personality and competitors.","Stop after two rounds and summarize."],
+  k:["Push back on generic answers."],
+  f:"Round 1 questions, then wait.",
+  c:"the questions are specific to my brand."}),
+ S("Write the voice","Words before visuals.",{
+  r:"You are a brand copy chief.",
+  o:"Write the brand voice.",ask:false,
+  p:["Define 4 traits as 'we are / we are not' pairs.","Write 5 sample sentences.","List words to use and avoid."],
+  f:"Traits, samples, word lists.",
+  c:"each trait has a concrete example."}),
+ S("Visual direction","Three clear options.",{
+  r:"You are a brand identity designer.",
+  o:"Propose 3 visual directions.",ask:false,
+  p:["For each give a palette with roles, type pairing, imagery style and logo approach.","Explain how each fits the voice and name its main risk."],
+  f:"Three direction cards and a recommendation.",
+  c:"the directions are genuinely different."}),
+ S("Guidelines page","One shareable reference.",{
+  r:"You are a brand systems designer.",
+  o:"Combine the chosen direction into a one-page guideline.",
+  i:["Chosen direction: [WHICH ONE]"],ask:false,
+  p:["Include story, voice, colours, type, logo usage, and do and don't examples."],
+  f:"One-page guideline in markdown.",
+  c:"a new designer could apply it without asking me."})
+]},
+{n:"Fix a bug",d:"Evidence, hypotheses, fix, prevention.",steps:[
+ S("Describe the evidence","Facts before theories.",{
+  r:"You are a methodical debugging partner.",
+  o:"Understand the bug before proposing anything.",
+  i:["Expected: [WHAT SHOULD HAPPEN]","Actual: [WHAT HAPPENS]","Steps to reproduce: [STEPS]","Error output: [PASTE]","Relevant code: [PASTE]"],ask:false,
+  p:["Summarize what you understand.","List what evidence is missing and ask for it."],
+  k:["Do not fix anything yet."],
+  f:"Understanding (3 lines), missing evidence list.",
+  c:"nothing in your summary is invented."}),
+ S("Rank the causes","Test the likeliest first.",{
+  r:"You are a debugging partner.",
+  o:"Rank the likely causes.",ask:false,
+  p:["List 3 causes ranked by probability.","For each, give the quickest test to confirm or rule it out."],
+  f:"Table: cause, probability, test.",
+  c:"each test can be run in minutes."}),
+ S("Apply the fix","Smallest change that works.",{
+  r:"You are a careful developer.",
+  o:"Fix the confirmed cause.",
+  i:["Result of the test: [WHAT HAPPENED]"],ask:false,
+  p:["Show the exact change as a diff.","Explain why it solves the problem and how to verify it."],
+  k:["Change nothing unrelated."],
+  f:"Diff, explanation, verification steps.",
+  c:"the change is minimal."}),
+ S("Prevent it","Make it stay fixed.",{
+  r:"You are a test engineer.",
+  o:"Stop this class of bug coming back.",ask:false,
+  p:["Write a test that would have caught this bug.","Suggest one change that prevents this kind of bug."],
+  f:"Test code, prevention suggestion.",
+  c:"the test fails without the fix."})
+]},
+{n:"Create a course or workshop",d:"Outcome, outline, content, launch.",steps:[
+ S("Audience and outcome","One promise.",{
+  r:"You are an instructional designer.",
+  o:"Define the single outcome learners will have.",
+  i:["Topic: [TOPIC]","Audience: [WHO]","Their starting level: [LEVEL]"],
+  p:["Ask what you need, then wait.","Write the outcome in one sentence."],
+  f:"Questions first. Then the outcome sentence.",
+  c:"the outcome is observable."}),
+ S("Outline","Sessions with purpose.",{
+  r:"You are an instructional designer.",
+  o:"Design the outline.",
+  i:["Number of sessions: [N]","Session length: [MINUTES]"],ask:false,
+  p:["For each session give the outcome, 3 sections, an activity and a take-home task."],
+  f:"Session table.",
+  c:"the sessions build toward the outcome."}),
+ S("Write session one","Scripted and timed.",{
+  r:"You are an engaging teacher.",
+  o:"Write session 1 in full.",ask:false,
+  p:["Give a timed agenda.","Write a spoken script for teaching parts.","Write activity instructions and a check question."],
+  f:"Agenda table, then script.",
+  c:"timings add up to the session length."}),
+ S("Assessment and activities","Prove they learned.",{
+  r:"You are an assessment designer.",
+  o:"Create the final project and rubric.",ask:false,
+  p:["Write the final project brief.","Create a rubric with 4 criteria and 3 levels each.","Write a 5-question feedback form."],
+  f:"Project brief, rubric table, feedback questions.",
+  c:"the rubric measures the stated outcome."}),
+ S("Launch copy","Say it clearly.",{
+  r:"You are a conversion copywriter.",
+  o:"Write the course page copy.",ask:false,
+  p:["Write headline, who it is for, what they will be able to do, session list, 4-question FAQ and a call to action."],
+  k:["Do not invent testimonials."],
+  f:"Copy by section.",
+  c:"the page promises exactly what the course delivers."})
+]}
+];
+GOALS.forEach(function(g){g.steps=g.steps.map(function(s,i){return [s[0],s[1],mk(s[2],i>0)];});});
+
+function stepsFor(g){
+  var s=GOALS[g].steps.slice();
+  if(N.stage==="material"){
+    s.unshift(["Share what you have","Starts from your existing material, not a blank page.",mk({
+      r:"You are a senior analyst who reviews existing work before changing it.",
+      o:"Review what I already have for '"+GOALS[g].n+"' and tell me what is missing before we continue.",
+      i:["My material: [PASTE NOTES, DRAFT, CODE OR LINKS]","What I am trying to achieve: [GOAL]"],ask:false,
+      p:["Summarize the material in 5 bullets.","List what is missing to reach the goal.","Say which of the next steps I can skip or shorten.","Wait for my reply before continuing."],
+      f:"Summary, gaps, steps to skip.",
+      c:"the gaps you list are real omissions, not style opinions."})]);
+  }
+  return s;
+}
+
+/* ---------- Section 3: project types ---------- */
+var OLD_TYPES=[
+{id:"web",label:"Web app",role:"full-stack web engineer and product designer",screens:"SCREENS",
+ reqs:["Mobile-first responsive layout. Keyboard and screen-reader accessible (WCAG AA).","Validate all input on both client and server. Never trust client data.","Row-level access rules for every table. No secrets in client code.","Loading, empty and error states on every screen.","Tests for core logic and for the main user journey."],
+ ex:{name:"ClientDesk",
+  purpose:"A client portal where freelance designers share work in progress, collect approvals with comments pinned to a specific version, and track invoice status, so feedback stops getting lost in email threads.",
+  users:"Primary: solo designers and 2-5 person studios managing 3-10 active client projects. Secondary: clients who review work and should never need to create a password.",
+  features:"1. Projects with versioned file uploads (images, PDF)\n2. Magic-link access for clients\n3. Comments pinned to a point on a file version\n4. One-click Approve / Request changes\n5. Invoice list with status (draft, sent, paid, overdue)\n6. Email notifications for new comments and approvals",
+  journey:"Designer creates a project and uploads version 1, then shares a magic link. The client opens it on a phone, pins comments, and taps Approve or Request changes. The designer is notified, uploads version 2, and the client approves. The designer marks the invoice sent, later paid.",
+  data:"Designers, clients, projects, file versions (file, version number, date), comments (version, x/y position, text, author), approvals (version, status, timestamp), invoices (project, amount, currency, due date, status). Client files are private to their project.",
+  screens:"Designer: Dashboard, Project detail, Upload version, Invoices, Settings. Client: Magic-link landing, Review (file viewer with pins), Approval confirmation.",
+  stack:"Next.js (App Router) with TypeScript, Tailwind, Supabase (Auth, Postgres, Storage), Resend for email, deployed on Vercel.",
+  style:"Calm and editorial: generous whitespace, deep ink text on a warm off-white, one violet accent, no stock illustrations. The file viewer is the hero and the chrome stays quiet.",
+  donts:"No in-app chat, no payment processing, no team roles beyond owner and reviewer, no AI features in version 1.",
+  success:"A client can open the link on a phone, review a design, leave a pinned comment and approve in under 60 seconds without creating an account. A designer sees every project's status at a glance."}},
+{id:"mobile",label:"Mobile app",role:"Android engineer and mobile UX designer",screens:"SCREENS",
+ reqs:["Material 3, dark theme support, minimum touch target 48dp.","Offline-first: the main journey must work without a network.","Handle permission denial and process death gracefully.","Cold start under 2 seconds on a mid-range phone.","Unit-test business logic. Include one UI test of the main journey."],
+ ex:{name:"Dukaan Ledger",
+  purpose:"An offline-first daily ledger for small shop owners to record sales, expenses and credit given to customers in two taps, and see profit for the day, week and month.",
+  users:"Owners of kirana, tailoring, repair and food shops, aged 25-55, on mid-range Android phones with patchy data, who prefer Hindi or English.",
+  features:"1. Quick-add sale or expense (amount, category, optional note)\n2. Customer credit book (udhaar) with balances and reminders\n3. Daily summary: sales, expenses, profit\n4. Weekly and monthly charts\n5. Export to CSV and share via WhatsApp\n6. Hindi and English",
+  journey:"Open the app, tap Sale or Expense, type the amount on a large number pad, pick a category chip, tap Save (under 5 seconds). At day end, open Summary to see profit. Tap a customer to record a credit payment.",
+  data:"Entries (type, amount, category, note, timestamp), customers (name, phone), credit transactions (customer, amount, direction, date). All data is stored on the device, with optional encrypted backup to the user's own Google Drive.",
+  screens:"Home (today's totals and quick add), Add entry, Credit book, Customer detail, Reports, Settings (language, backup, export).",
+  stack:"Kotlin with Jetpack Compose and Material 3, Room database, WorkManager for reminders and backups, Hilt for dependency injection.",
+  style:"High contrast, large type and touch targets, friendly but serious. Deep green with a warm yellow accent, the number pad as the hero, icons always paired with text.",
+  donts:"No ads, no account or login, no online-only features, no GST or invoicing in version 1.",
+  success:"A new user records their first sale within 30 seconds of opening the app, and every core action works in airplane mode."}},
+{id:"site",label:"Website",role:"web designer and front-end engineer",screens:"PAGES AND SECTIONS",
+ reqs:["Semantic HTML, one h1 per page, logical heading order.","Core Web Vitals targets: LCP under 2.5s, CLS under 0.1.","Meta titles and descriptions, Open Graph tags, sitemap.xml.","Optimized images with width and height set and lazy loading.","Contact form with validation and spam protection. No tracking without consent."],
+ ex:{name:"Northlight Architecture Studio",
+  purpose:"A portfolio website that presents the studio's residential and cultural projects and turns visitors into qualified enquiries.",
+  users:"Prospective homeowners and institutions planning a build or renovation, plus journalists and potential hires. Mostly on mobile via Instagram and search.",
+  features:"1. Project gallery filterable by type and city\n2. Case-study pages with story, plans, photographs and credits\n3. Studio page with team and approach\n4. Journal for project notes and press\n5. Enquiry form asking budget range, location and timeline\n6. Press kit download",
+  journey:"A visitor lands from search or Instagram, browses a project, reads the case study, checks the studio's approach, then submits the enquiry form with budget and timeline.",
+  data:"Projects (title, year, type, city, area, credits, images with captions), journal posts, team members, enquiries (name, email, phone, budget range, location, timeline, message).",
+  screens:"Home, Projects (grid), Project case study, Studio, Journal and post, Contact / Enquiry, 404.",
+  stack:"Astro with plain CSS, content in Markdown files, images optimized at build time, forms via Formspree, hosted on Netlify.",
+  style:"Quiet and architectural: large photography, thin type, plenty of white space, one warm stone neutral and a single dark accent. Only subtle image fades for motion.",
+  donts:"No stock photos, no autoplay video, no pop-ups, no CMS login in version 1.",
+  success:"Lighthouse performance above 90 on mobile, and at least 3% of project-page visitors completing the enquiry form after launch."}},
+{id:"dash",label:"Dashboard",role:"data-visualization engineer and information designer",screens:"VIEWS",
+ reqs:["Summary first, detail on demand: headline numbers, then trends, then tables.","Encode status with shape or text as well as colour.","Define each metric precisely (formula, period, source) in a tooltip or definitions page.","Charts with direct labels, honest axes, bar charts starting at zero.","Show missing and stale data visibly, with a last-updated time."],
+ ex:{name:"Studio Pulse",
+  purpose:"A dashboard that gives a small design studio an at-a-glance view of income, active projects, utilization and overdue invoices, replacing a weekly spreadsheet check.",
+  users:"The studio owner (daily) and a project manager (daily). A bookkeeper views it read-only each month.",
+  features:"1. Headline cards: income this month vs last, outstanding invoices, active projects, utilization\n2. Monthly income trend (12 months)\n3. Project list with budget used vs time elapsed\n4. Overdue invoice alerts with days overdue\n5. Filters by client and date range\n6. Definitions panel for each metric",
+  journey:"The owner opens the dashboard each morning, checks the four headline numbers, clicks Overdue invoices to see which clients, then opens the project list to spot projects over budget.",
+  data:"Invoices (client, amount, issue date, due date, paid date), projects (client, budget, start, end, status), time entries (project, person, hours, date). Imported from monthly CSV exports, with no live integrations in version 1.",
+  screens:"Overview, Projects, Invoices, Clients, Data import, Definitions.",
+  stack:"React with TypeScript, Recharts, Papa Parse for CSV, data kept in the browser (IndexedDB), deployed on Vercel.",
+  style:"Dense but calm: neutrals tinted toward blue, semantic red / amber / green with icons, tabular figures, charts with direct labels and a faint grid.",
+  donts:"No user accounts, no live accounting integrations, no forecasting in version 1, no 3D or decorative charts.",
+  success:"The owner can answer 'are we healthy this month?' in under 10 seconds from opening the page, and every number traces to a definition."}},
+{id:"bot",label:"AI chatbot",role:"conversational-AI engineer and prompt designer",screens:"CONVERSATION FLOWS",
+ reqs:["Write the full system prompt: role, scope, tone, refusal and escalation rules.","Ground answers in the supplied knowledge only. Say 'I don't know' and offer a hand-off when unsure.","Collect no sensitive data beyond what the flow needs, and always with consent.","Include 10 test conversations (normal, ambiguous, out-of-scope, adversarial) with expected behaviour.","Log conversations for review and give staff a way to flag bad answers."],
+ ex:{name:"Admit Guide",
+  purpose:"A chatbot that answers prospective students' admission questions around the clock, captures their intent, and hands complex cases to a human counsellor.",
+  users:"Applicants (17-25) and their parents asking about eligibility, deadlines, fees, documents and scholarships, mostly on mobile, in English or Hinglish.",
+  features:"1. Answer FAQs from the official admissions handbook\n2. Eligibility checker (course, marks, entrance exam)\n3. Deadline and fee lookup by course\n4. Document checklist\n5. Capture name, phone and course interest with consent\n6. Hand-off to a counsellor with the chat transcript",
+  journey:"The applicant opens the chat and sees a greeting with topic buttons. They ask about eligibility, the bot checks the rules and answers with the handbook section it used, offers a document checklist, then offers a counsellor and collects consent and a phone number.",
+  data:"Knowledge base (handbook sections, fee tables, deadlines) as the only source of truth. Leads (name, phone, course, consent flag, timestamp). Conversation logs with personal data masked.",
+  screens:"Greeting and topic menu, Free-form Q&A, Eligibility flow, Fees and deadlines flow, Document checklist, Lead capture, Human hand-off, Out-of-scope reply.",
+  stack:"A hosted LLM API with retrieval over the handbook (vector search), a small Node backend, a chat widget embedded on the college site, lead storage in Postgres.",
+  style:"Friendly and precise: short answers, plain words, one question at a time, always cite the handbook section. Follows the college's blue and gold.",
+  donts:"Never promise admission or scholarships, never invent fees or dates, never give legal or visa advice, never ask for ID numbers or payment details.",
+  success:"At least 80% of FAQ test questions answered correctly with a citation, zero invented numbers across a 30-question audit, and every unresolved chat reaching a human within one message."}}
+];
+var FIELDS=[
+["name","Project name","Short and memorable",false],
+["purpose","What it does and why","The problem it solves, in 1-2 sentences",true],
+["users","Who it is for","Who uses it, in what situation, on what device",true],
+["features","Core features","Numbered, most important first (3-7)",true],
+["journey","Main user journey","Step by step: start to finish of the key task",true],
+["data","Data it handles","What it stores, where it comes from, who can see it",true],
+["screens","Screens or pages","List every screen or page",true],
+["stack","Tech or platform","Languages, frameworks, hosting",false],
+["style","Look and feel","Mood, colours, references",true],
+["donts","Out of scope","What it must NOT do or include in version 1",true],
+["success","Success looks like","A measurable outcome",true]
+];
+var COMMON_EX={};
+
+function baseTpl(t){
+  return "ROLE\nYou are a senior "+t.role+". You work in small, verified steps, explain trade-offs briefly, and ask before assuming.\n\n"+
+  "PROJECT\nName: {{name}}\nPurpose: {{purpose}}\n\n"+
+  "USERS\n{{users}}\n\n"+
+  "CORE FEATURES (most important first)\n{{features}}\n\n"+
+  "MAIN USER JOURNEY\n{{journey}}\n\n"+
+  "DATA\n{{data}}\n\n"+
+  t.screens+"\n{{screens}}\n\n"+
+  "TECH\n{{stack}}\n\n"+
+  "LOOK AND FEEL\n{{style}}\n\n"+
+  "OUT OF SCOPE FOR VERSION 1\n{{donts}}\n\n"+
+  "SUCCESS CRITERIA\n{{success}}\n\n"+
+  "STANDARDS\n"+t.reqs.map(function(x){return "- "+x;}).join("\n")+"\n\n"+
+  "HOW WE WILL WORK\n"+
+  "1. Review this brief and ask up to 7 questions about gaps, risks or contradictions. Wait for my answers.\n"+
+  "2. Propose an architecture overview, the data model and a milestone plan. Each milestone must be shippable and testable.\n"+
+  "3. Build one milestone at a time. After each, list the files changed, how to run and verify it, and what comes next. Wait for my 'continue'.\n"+
+  "4. If a requirement is unclear or two requirements conflict, stop and ask instead of guessing.\n"+
+  "5. At the end, give a release checklist covering testing, accessibility, security and deployment.\n\n"+
+  "OUTPUT FORMAT\nStart with your questions only. Do not write code until I answer them.";
+}
+
+
+/* ---------- Foundry types (final): sales page and content plan get their own fields ---------- */
+function oldType(id){return OLD_TYPES.filter(function(t){return t.id===id;})[0];}
+function withSamples(id,label,samples){var o=Object.assign({},oldType(id));o.label=label;o.samples=samples;return o;}
+function tplFor(t){return t.tpl||baseTpl(t);}
+function fieldsOf(t){return t.fields||FIELDS;}
+
+var SALES_FIELDS=[
+["name","Offer name","What it is called",false],
+["offer","What you sell","What it is and exactly what is inside",true],
+["audience","Who it is for","Who they are and what they have already tried",true],
+["pains","Their problem, in their words","Real quotes if you have them",true],
+["outcome","The result they get","What changes for them",true],
+["proof","Proof you can show","Numbers, testimonials, results. Leave blank if you have none",true],
+["objections","Doubts and your answers","Each doubt followed by your honest answer",true],
+["price","Price and terms","Price, what is included, bonuses, how they pay",true],
+["guarantee","Risk reversal","Refund or support promise",true],
+["cta","The one action","The single thing you want them to do",false],
+["voice","Voice and style","How it should sound",true],
+["format","Page format","Platform, length, layout notes",true]
+];
+var SALES_TPL="ROLE\nYou are a senior direct-response copywriter and conversion designer. You write clear, honest sales pages that sell without hype, and you never invent proof.\n\n"+
+"OFFER\nName: {{name}}\nWhat it is: {{offer}}\n\n"+
+"AUDIENCE\n{{audience}}\n\n"+
+"THEIR PROBLEM, IN THEIR WORDS\n{{pains}}\n\n"+
+"THE RESULT THEY WANT\n{{outcome}}\n\n"+
+"PROOF I CAN SHOW\n{{proof}}\n\n"+
+"DOUBTS TO ANSWER\n{{objections}}\n\n"+
+"PRICE AND TERMS\n{{price}}\n\n"+
+"RISK REVERSAL\n{{guarantee}}\n\n"+
+"THE ONE ACTION\n{{cta}}\n\n"+
+"VOICE\n{{voice}}\n\n"+
+"PAGE FORMAT\n{{format}}\n\n"+
+"RULES\n- Use only the proof I supplied. Where proof is missing, write [PROOF NEEDED] instead of inventing it.\n- Never invent testimonials, numbers, scarcity or deadlines.\n- Lead with the reader's problem, not the product.\n- One call to action, repeated at natural points.\n- Sentences under 18 words. No hype words such as 'revolutionary' or 'game-changing'.\n\n"+
+"HOW WE WILL WORK\n1. Ask up to 5 questions about gaps, weak claims or contradictions in this brief. Wait for my answers.\n2. Give 3 headline options and a page outline (hero, problem, the shift, what is inside, who it is for and not for, proof, doubts as FAQ, price and guarantee, final call to action) with one line per section. Wait for my pick.\n3. Write the full page section by section in the agreed voice.\n4. Check the draft against the rules and list every [PROOF NEEDED] marker I still have to fill.\n5. Finish with 3 alternative calls to action and 2 subject lines for an email announcing the page.\n\n"+
+"OUTPUT FORMAT\nStart with your questions only. Do not write the page until I answer them.";
+
+var CONTENT_FIELDS=[
+["name","Brand or person","Who is posting",false],
+["goal","Goal for the month","One main result, with a number if you can",true],
+["audience","Who you want to reach","Be specific",true],
+["platforms","Platforms and their jobs","What each platform is for",true],
+["pillars","Content pillars","3-4 themes in priority order",true],
+["cadence","Posting rhythm and time","Posts per week and hours you really have",true],
+["fixed","Recurring series","Weekly or fixed-day series, if any",true],
+["voice","Voice","How you sound",true],
+["offer","What to promote and when","How much teaching before selling",true],
+["material","Real stories and facts to use","Only material you can back up",true],
+["avoid","Avoid","Words, topics, claims",true],
+["month","Month and start date","When the calendar starts",false]
+];
+var CONTENT_TPL="ROLE\nYou are a senior content strategist and ghostwriter. You plan content that builds trust before it asks for anything, and you write in the client's real voice.\n\n"+
+"BRAND\n{{name}}\n\n"+
+"GOAL FOR THE MONTH\n{{goal}}\n\n"+
+"AUDIENCE\n{{audience}}\n\n"+
+"PLATFORMS AND THEIR JOBS\n{{platforms}}\n\n"+
+"CONTENT PILLARS (in priority order)\n{{pillars}}\n\n"+
+"POSTING RHYTHM AND TIME BUDGET\n{{cadence}}\n\n"+
+"RECURRING SERIES\n{{fixed}}\n\n"+
+"VOICE\n{{voice}}\n\n"+
+"WHAT TO PROMOTE AND WHEN\n{{offer}}\n\n"+
+"REAL MATERIAL YOU MAY USE\n{{material}}\n\n"+
+"AVOID\n{{avoid}}\n\n"+
+"MONTH\n{{month}}\n\n"+
+"RULES\n- Use only the real stories, facts and numbers above. Where a post needs a detail I have not given, write [NEED DETAIL].\n- Every post has a first-line hook, one idea and one type of call to action.\n- Never plan more posts than my time budget allows.\n- Do not repeat the same hook style on consecutive days.\n\n"+
+"HOW WE WILL WORK\n1. Ask up to 5 questions about gaps or conflicts in this brief. Wait for my answers.\n2. Give the strategy: four weekly themes that build trust before the offer, the post mix per platform, and one line explaining each theme. Wait for my approval.\n3. Produce the full calendar as a table: date, platform, pillar, format, hook, key point, call to action, asset needed. Wait for my approval.\n4. Draft the posts one week at a time, full copy, and wait for my 'continue' before the next week.\n5. Finish with a batching schedule that fits my time budget and a list of the photos, clips and screenshots I need to prepare.\n\n"+
+"OUTPUT FORMAT\nStart with your questions only. Do not plan or write anything until I answer them.";
+
+var TYPES=[
+withSamples("site","Website",[
+{l:"Small brand · Marigold & Co.",v:{
+name:"Marigold & Co.",
+purpose:`Sell hand-poured soy candles and gift sets online, and tell the story behind the brand so first-time visitors trust a small maker enough to order.`,
+users:`Gift buyers and home-décor lovers aged 25-45, arriving from Instagram on their phones. They want a thoughtful gift quickly and care about who made it.`,
+features:`1. Shop with 12 products, photos, scent notes, burn time and size options
+2. Gift sets with an optional gift message
+3. Our story page with the maker's photo and how the candles are made
+4. Customer reviews
+5. Delivery and returns information that is easy to find
+6. Contact and wholesale enquiry form
+7. Link to Instagram`,
+journey:`A visitor taps a product on Instagram and lands on its page. They read the scent notes and reviews, choose a size, add to cart, add a gift message, pay by card or wallet, and receive an email confirming the delivery date.`,
+data:`Products (name, scent notes, sizes, price, photos, stock), orders (items, address, gift message, status), newsletter emails (only with consent), reviews (name, rating, text). Payments are handled by the payment provider. The site never stores card numbers.`,
+screens:`Home, Shop, Product page, Cart and checkout, Gift sets, Our story, Delivery and returns, Contact and wholesale, Privacy policy, 404.`,
+stack:`I want something I can manage myself without coding, with a budget under [MONTHLY BUDGET] a month. Recommend one platform and explain why.`,
+style:`Clean and warm: off-white background, deep green text, one marigold accent, large product photography, handwritten touches used sparingly. Friendly but not twee.`,
+donts:`No pop-ups, no account required to buy, no autoplay video, no stock photos, no discount banners.`,
+success:`A visitor on a phone can go from product page to paid order in under 2 minutes, the mobile page loads in under 3 seconds, and at least 2% of visitors order within 3 months.`}},
+{l:"Own brand · The Elevation Citadel",v:{
+name:"The Elevation Citadel",
+purpose:`The official website of a brand identity and design studio (tagline "Connect. Craft. Elevate.") that turns visitors into brand identity clients and buyers of its digital products and workshops.`,
+users:`Founders, small-business owners, student creators and campus founders who need a professional brand identity, plus graduates looking for career kits. Most arrive from LinkedIn and Instagram on their phones.`,
+features:`1. Home page explaining the Connect, Craft, Elevate process
+2. Services page with brand identity packages and a clear way to enquire
+3. Shop for digital products: Job Application Kit for Graduates, brand starter kit, brand system PDF
+4. Workshops page for the beginner Canva masterclass, with booking
+5. Free Brand Audit download in exchange for an email address
+6. Portfolio of brand work
+7. About page with the founder's story`,
+journey:`A founder sees a LinkedIn post and opens the site. They understand the process in seconds, download the Free Brand Audit with their email, get a follow-up email, then book a call or buy the Brand Starter Kit.`,
+data:`Leads (name, email, interest, source), digital product orders handled by a payment provider, workshop bookings (name, email, phone), portfolio projects (client names only with permission).`,
+screens:`Home, Services, Shop, Workshops, Free Brand Audit, Portfolio, About, Contact, Privacy policy.`,
+stack:`Next.js or plain HTML, CSS and JavaScript, deployed on Vercel. Payment links for INR and USD to start. A free email service for lead capture.`,
+style:`Purple and gold: deep purple backgrounds, gold accents, bold readable type, premium but friendly. The purple eagle logo anchors the page. Large text that is easy to read on a phone.`,
+donts:`No stock photos, no clutter, no page without a clear next step, no unproven claims, no invented testimonials.`,
+success:`A visitor understands what the studio does within 5 seconds, and at least 1 in 10 visitors takes one action: downloads the audit, books a call or buys a product.`}}
+]),
+{id:"sales",label:"Sales page",fields:SALES_FIELDS,tpl:SALES_TPL,samples:[
+{l:"Small brand · Marigold starter kit",v:{
+name:"Marigold Candle-Making Starter Kit",
+offer:`A boxed kit with everything a beginner needs to pour 3 soy candles at home: soy wax, 3 wicks and jars, 2 fragrance oils, a thermometer, and a printed step-by-step guide with a QR link to a 12-minute video tutorial.`,
+audience:`Adults aged 25-45 who want a relaxing hands-on activity at home, or a gift that is an experience. Complete beginners with no equipment.`,
+pains:`"I want to try candle-making but I don't know what to buy." "I bought supplies separately and wasted money." "Tutorials assume I already have the right wax and wicks."`,
+outcome:`Pour three finished candles in one afternoon (about 90 minutes), with a clean burn and a scent they chose themselves.`,
+proof:`[NUMBER] kits sold. [3 CUSTOMER REVIEWS WITH FIRST NAMES]. [PHOTOS OF CUSTOMERS' FINISHED CANDLES]. The maker has been pouring candles for [YEARS] years.`,
+objections:`"Is it hard?" No sewing and no special tools, and the guide has photos for every step.
+"Is it safe?" The wax melts in a warm water bath and a safety card is included.
+"Will the candles turn out well?" The wax and wick pairing is matched for the jar size.
+"Is it a good gift?" It ships in a gift box, with optional gift wrap.`,
+price:`[PRICE]. Free delivery over [AMOUNT]. Optional gift wrap [PRICE]. Pay by card or wallet.`,
+guarantee:`If anything arrives damaged or missing, we replace it free. If you follow the guide and are not happy with your candles, tell us within 30 days and we will make it right.`,
+cta:`Order the starter kit`,
+voice:`Warm, friendly, a little playful, plain words. Like a maker talking to a friend.`,
+format:`One mobile-first page: hero with product photo, what is in the box, how it works in 3 steps, reviews, FAQ, and a sticky buy button.`}},
+{l:"Own product · Job Application Kit",v:{
+name:"Job Application Kit for Graduates",
+offer:`A ₹500 bundle of five field-specific Professional Tools Guide PDFs: Engineering, Business and Management, Applied Health Science, Computer Applications, and Law and Liberal Arts. Inside each guide: [WHAT IS INSIDE EACH GUIDE].`,
+audience:`Final-year students and fresh graduates in India applying for their first job or internship, who do not know what employers in their field expect and are overwhelmed by generic advice.`,
+pains:`"Every template online is for a different field." "I have no experience, so what do I put on my CV?" "I don't know which tools and skills employers in my field expect." [ADD REAL QUOTES YOU HAVE HEARD]`,
+outcome:`A professional, field-specific application ready to send, and clarity on the tools and skills their field expects.`,
+proof:`[NUMBER OF BUYERS OR DOWNLOADS]. [STUDENT FEEDBACK]. [YOUR CREDENTIALS AS A DESIGNER AND AI EDUCATOR]. Leave anything you do not have blank.`,
+objections:`"Is it worth ₹500?" [YOUR ANSWER]
+"Is it for my field?" Yes. There are five versions, one for each field, and you use the one that matches yours.
+"Is it just templates?" [YOUR ANSWER]
+"Will it work for me with no experience?" [YOUR ANSWER]`,
+price:`₹500 one-time for all five guides. Delivery: [HOW THEY RECEIVE IT]. Payment: [PAYMENT METHOD OR LINK].`,
+guarantee:`[YOUR REFUND OR SUPPORT POLICY]`,
+cta:`Get the kit for ₹500`,
+voice:`Plain English, encouraging, confident. Short sentences. Friendly to students without slang overload.`,
+format:`Mobile-first single page in purple and gold, with a sticky buy button.`}},
+{l:"Own project · AI Unlocked",v:{
+name:"AI Unlocked",
+offer:`A plain-English beginner document that explains what AI chatbots are, how to talk to them clearly, and what to do with them first. Includes [NUMBER] ready-to-use prompts. Format: [PDF / NOTION / OTHER]. What is inside: [LIST THE MAIN SECTIONS].`,
+audience:`Complete beginners: students, creators and small-business owners who have heard of ChatGPT but get poor answers, feel left behind, or do not know where to start.`,
+pains:`"I type something and the answer is useless." "Everyone talks about AI and I don't know where to begin." "I'm afraid I'll do it wrong." [ADD REAL QUESTIONS FROM YOUR WEBINARS]`,
+outcome:`In one sitting they can write a clear prompt, get a useful answer, and know 5 things to do with AI this week.`,
+proof:`[WEBINAR ATTENDANCE OR FEEDBACK]. [BEFORE AND AFTER PROMPT EXAMPLES]. Leave anything you do not have blank.`,
+objections:`"Is it too technical?" No. It uses plain English only.
+"Do I need to pay for AI tools?" [CONFIRM WHICH FREE CHATBOTS IT WORKS WITH]
+"Will it be out of date next month?" It teaches the skill of explaining what you want, which works in any chatbot.
+"Why not just watch YouTube?" This puts one clear path and prompts you can copy in one place.`,
+price:`[PRICE]. Delivery: [HOW THEY RECEIVE IT].`,
+guarantee:`[YOUR REFUND OR SUPPORT POLICY]`,
+cta:`Get AI Unlocked`,
+voice:`Plain English, playful but clear, zero jargon, with side-by-side weak and strong examples.`,
+format:`Mobile-first page in purple and gold with a before and after prompt comparison near the top and a sticky buy button.`}}
+]},
+{id:"content",label:"Month of content",fields:CONTENT_FIELDS,tpl:CONTENT_TPL,samples:[
+{l:"Small brand · Marigold & Co.",v:{
+name:"Marigold & Co.",
+goal:`Gain 150 new Instagram followers who fit our buyer, collect 100 email sign-ups, and sell 40 gift sets in the gifting season.`,
+audience:`Gift buyers and home-décor lovers aged 25-45 who follow small makers on Instagram.`,
+platforms:`Instagram (main): reels, carousels and stories. Its job is to show the product and the maker. A monthly email newsletter: its job is to turn followers into buyers.`,
+pillars:`1. Behind the scenes: how the candles are made
+2. Gift ideas and scent guides
+3. Customer stories and reviews
+4. Candle care and safety tips`,
+cadence:`5 feed posts and 4 story days a week. About 6 hours a week in total. I film everything once a week in a single batch on Sunday.`,
+fixed:`Scent Sunday: one scent profile each week. Maker Monday: one behind-the-scenes clip.`,
+voice:`Warm, friendly, plain words, a little humour, never salesy.`,
+offer:`Weeks 1 and 2: no selling, build trust. Week 3: introduce the gift sets. Week 4: last-order dates and a gift guide. Mention the Candle-Making Starter Kit once in week 3 and once in week 4.`,
+material:`I started pouring candles in a spare room in [YEAR]. The best-selling scent is [SCENT]. Three real customer messages I can quote: [PASTE]. Photos and clips I have: [LIST].`,
+avoid:`No discount posts, no stock imagery, no more than one emoji per caption, no health claims or "aromatherapy benefits".`,
+month:`December 2026, starting Tuesday 1 December`}},
+{l:"Own brand · Elevated James",v:{
+name:"Elevated James (The Elevation Citadel)",
+goal:`Phase 1, build authority: grow a qualified audience on LinkedIn, Instagram and Facebook, and collect leads for the Free Brand Audit so I am ready to sell products in Phase 2.`,
+audience:`Student creators, campus founders, small-business owners, and people who are new to AI and want to build with it.`,
+platforms:`LinkedIn: authority on AI, systems and branding. Instagram: my personal brand plus a design showcase for The Elevation Citadel. Facebook: attract AI students and builders.`,
+pillars:`1. AI (the most energy right now)
+2. Systems
+3. Branding
+Building in Public connects all three.`,
+cadence:`2 hours a day, Monday to Friday. 2-3 posts a day across platforms. I batch-create on Sunday evening.`,
+fixed:`Instagram quote series: WORD on Sunday, WISDOM on Tuesday, WEALTH on Thursday.`,
+voice:`Plain English, confident, practical and encouraging. No hype.`,
+offer:`Weeks 1 and 2: authority and teaching only. Week 3: promote the Free Brand Audit. Week 4: invite people to the 2-day beginner Canva masterclass and the 30-minute Elevation Call.`,
+material:`My real experience: brand identity and Canva design work for clients, building AI agents and prompt systems, and teaching beginners in AI webinars. Three real stories or numbers I can use: [PASTE].`,
+avoid:`No fake results, no income claims, no hype words, no copying other creators' posts.`,
+month:`30 days starting Monday 9 November 2026`}},
+{l:"Own project · AI Unlocked launch",v:{
+name:"AI Unlocked",
+goal:`Launch the AI Unlocked beginner document: get [TARGET NUMBER] complete beginners to get it within 30 days.`,
+audience:`Complete beginners in AI: students, creators and small-business owners who feel left behind.`,
+platforms:`LinkedIn: teach and build authority. Instagram: carousels and reels showing before and after prompts. Facebook: a place for AI beginners to ask questions.`,
+pillars:`1. AI myths, busted in plain English
+2. Prompt makeovers: weak prompt to strong prompt
+3. "Try this today" mini lessons
+4. Behind the scenes of making AI Unlocked`,
+cadence:`One post per platform each weekday, 2 hours a day, batch-created on Sunday.`,
+fixed:`Prompt Makeover Monday: one weak prompt turned strong, side by side.`,
+voice:`Plain English, playful, zero jargon, always with a side-by-side example.`,
+offer:`Week 1: teach and tease. Week 2: share the first 3 lessons free. Week 3: launch with the sales page. Week 4: answer questions, share early feedback, final reminder.`,
+material:`Real prompt makeovers from my webinars. Real questions beginners asked me. Screenshots of before and after answers: [PASTE].`,
+avoid:`No claims that AI will replace jobs, no unverified statistics, no hype.`,
+month:`30 days starting [LAUNCH DATE]`}}
+]},
+withSamples("web","Web app",[
+{l:"Team tool · ClientDesk",v:oldType("web").ex},
+{l:"Own project · Video Summariser",v:{
+name:"Elevated Video Summariser",
+purpose:`Turn a YouTube video into a detailed, structured knowledge document that can be exported as Markdown or PDF, and repurposed into LinkedIn posts, carousels, study notes and article outlines.`,
+users:`Students, creators and founders who learn from long videos and want organised notes and content from them. They use the app on their own Windows PC.`,
+features:`1. Paste a YouTube link and validate it
+2. Fetch the transcript, or paste or upload one (.srt, .vtt, plain text) as a fallback
+3. Split long videos into chunks, summarise each, and merge them into one structured document
+4. Export to Markdown and PDF
+5. Repurposing studio: LinkedIn posts, carousels, study notes, article outlines
+6. Choose the AI provider: a hosted model API or a free local model (Ollama)`,
+journey:`The user pastes a link. The app gets the transcript, shows progress while it processes the video in chunks, then shows the finished document. The user edits it, exports a PDF, and opens the repurposing studio to create posts.`,
+data:`Transcripts and generated documents stay on the user's own machine. The only data sent out is the transcript, to the AI provider the user chose. No accounts.`,
+screens:`Home (paste a link), Processing, Document view, Export, Repurposing studio, Settings (AI provider).`,
+stack:`Next.js, TypeScript and Tailwind, run locally on the user's computer (not deployed). A transcript provider API with a manual fallback.`,
+style:`Clean and readable so documents look like polished study notes. Purple and gold to match The Elevation Citadel.`,
+donts:`No cloud deployment, no accounts, no downloading of video files, no sharing of other people's content beyond personal use.`,
+success:`A 30-minute video becomes a well-structured document in [MINUTES] minutes, the PDF export has no broken pages, and every section can be traced back to the video.`}}
+]),
+withSamples("mobile","Mobile app",[
+{l:"Own project · ElevatePad",v:{
+name:"ElevatePad",
+purpose:`A floating voice-to-text bubble that sits on top of any app, so the user can dictate, copy the text, and paste it where they need it.`,
+users:`People who write a lot on their phones, such as students, creators and founders, who find typing slow. Android 8 or newer.`,
+features:`1. Floating bubble the user can drag and snap to a screen edge
+2. Tap the bubble to open a small dictation panel and start speaking
+3. Live transcript that appends new speech without losing earlier text
+4. One-tap copy to the clipboard
+5. Language selection
+6. Clear messages for permission and speech errors (microphone, overlay)`,
+journey:`The user grants the overlay and microphone permissions once and starts the service. The bubble appears. In any app they tap the bubble, speak, check the text, tap Copy, close the panel, and paste into the app they were using.`,
+data:`Dictated text lives in memory only and is never saved or logged. Only the bubble position and the chosen language are stored on the device. No network use.`,
+screens:`Setup and permissions screen, Floating bubble, Dictation panel, Settings (language, bubble).`,
+stack:`Kotlin with XML views and Material 3, Android's built-in SpeechRecognizer, a WindowManager overlay with a foreground microphone-type service, Jetpack DataStore. minSdk 26.`,
+style:`Small, unobtrusive and friendly. High contrast. Purple and gold branding.`,
+donts:`No network access, no saved transcripts, no accessibility-service auto-typing, no ads, no account.`,
+success:`The bubble appears over other apps reliably, a 60-second dictation is captured without losing text, and the text can be pasted into another app in two taps.`}},
+{l:"Shop tool · Dukaan Ledger",v:oldType("mobile").ex}
+]),
+withSamples("dash","Dashboard",[
+{l:"Own project · Citadel Tracker",v:{
+name:"Citadel Growth Tracker",
+purpose:`A simple dashboard that shows whether The Elevation Citadel's content and product funnel is working: posts published, engagement per platform, Free Brand Audit sign-ups, and product sales.`,
+users:`The founder, checking it every morning.`,
+features:`1. Headline cards: posts this week against target, new audit leads, product sales, Elevation Calls booked
+2. Posts per platform against the 2-3 posts a day target
+3. Pillar balance chart: AI, Systems, Branding, Building in Public
+4. Funnel: audience, audit download, Brand Starter Kit, Elevation Brand System
+5. A notes box for what worked this week`,
+journey:`He opens the dashboard each morning, checks whether yesterday's posting target was hit, sees which pillar is under-posted, then looks at the funnel to see where people drop off.`,
+data:`Entered by hand or imported from CSV exports: posts (date, platform, pillar, format), metrics (reach, likes, comments, saves), leads, sales. Stored in the browser. No accounts.`,
+screens:`Overview, Content, Funnel, Add data and import, Definitions.`,
+stack:`A lightweight web app (React or plain JavaScript) with charts, data stored in the browser, deployable on Vercel.`,
+style:`Purple and gold, high contrast, big readable numbers, status shown with icons and text as well as colour.`,
+donts:`No live social media integrations in version 1, no user accounts, no predictions, no metric without a definition.`,
+success:`He can answer "am I on track this week?" in under 10 seconds, and every number has a definition.`}},
+{l:"Studio tool · Studio Pulse",v:oldType("dash").ex}
+]),
+withSamples("bot","AI chatbot",[
+{l:"Own project · Brand Strategy Architect",v:{
+name:"Brand Strategy Architect",
+purpose:`An AI agent that guides a founder through Connect, Craft, Elevate and produces a brand strategy: positioning, audience, voice and visual direction.`,
+users:`Small-business owners, student founders and freelancers who have no brand strategy yet, using any popular chatbot.`,
+features:`1. Connect: ask discovery questions about purpose, audience and competitors, one round at a time
+2. Craft: turn the answers into positioning, voice and messaging
+3. Elevate: propose a visual direction and next actions
+4. Summarise everything as a one-page brand brief
+5. Works across ChatGPT, Claude and Gemini with plain text and no tool dependencies`,
+journey:`The user pastes the agent's instructions into a chatbot and says hello. The agent runs the Connect round, then Craft, then Elevate, checking the user's answers at each step, and ends by producing the one-page brand brief.`,
+data:`Only what the user types in the chat. The agent never asks for passwords, ID numbers or financial details.`,
+screens:`Greeting and how it works, Connect round, Craft round, Elevate round, Brand brief, Out-of-scope reply.`,
+stack:`A system prompt that works in any chatbot, with an optional hosted LLM API version later.`,
+style:`Warm, direct and professional. Short questions, one round at a time, plain English.`,
+donts:`Never invent facts about the user's market, never promise business results, never give legal advice, never skip a round.`,
+success:`A new founder finishes all three rounds in one sitting and leaves with a brief they can hand to a designer.`}},
+{l:"Service bot · Admit Guide",v:oldType("bot").ex}
+])
+];
+
+
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s);}
+function h(tag,props){
+  var e=document.createElement(tag),p=props||{},k,i,kids=[].slice.call(arguments,2);
+  for(k in p){var v=p[k];
+    if(k==="class")e.className=v;
+    else if(k==="text")e.textContent=v;
+    else if(k.slice(0,2)==="on")e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,"");
+    else if(v!==false&&v!=null)e.setAttribute(k,v);}
+  (function add(list){for(i=0;i<list.length;i++){var c=list[i];
+    if(c==null||c===false)continue;
+    if(Array.isArray(c))add(c);
+    else e.appendChild(c&&c.nodeType?c:document.createTextNode(String(c)));}})(kids);
+  return e;
+}
+function lsGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var toastT;
+function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},1800);}
+function copyText(text){
+  function fallback(){
+    var ta=h("textarea",{style:"position:fixed;opacity:0;top:0;left:0"});ta.value=text;document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+    document.body.removeChild(ta);toast(ok?"Copied":"Select the text and copy it");
+  }
+  try{navigator.clipboard.writeText(text).then(function(){toast("Copied");},fallback);}catch(e){fallback();}
+}
+function saveMd(filename,text){
+  if(!(window.claude&&window.claude.use)){copyText(text);return;}
+  window.claude.use("downloads").then(function(d){
+    if(!d){copyText(text);toast("Download unavailable here, copied instead");return;}
+    return d.save({filename:filename,data:text}).then(function(){toast("Saved");},function(e){
+      if(e&&e.code==="declined")return;
+      copyText(text);toast("Could not save, copied instead");});
+  },function(){copyText(text);});
+}
+function phSpans(text){
+  var parts=text.split(/(\[[^\]\n]+\])/),out=[];
+  parts.forEach(function(s){if(!s)return;out.push(/^\[[^\]]+\]$/.test(s)?h("span",{class:"ph",text:s}):document.createTextNode(s));});
+  return out;
+}
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+
+/* ---------- tabs ---------- */
+var tab=lsGet("epc-tab2","0");
+function showTab(t){
+  tab=t;lsSet("epc-tab2",t);
+  ["0","1","2","3"].forEach(function(n){$("#p"+n).hidden=n!==t;});
+  [].forEach.call(document.querySelectorAll("nav.tabs button"),function(b){b.setAttribute("aria-selected",String(b.dataset.tab===t));});
+  window.scrollTo(0,0);
+}
+[].forEach.call(document.querySelectorAll("nav.tabs button"),function(b){b.addEventListener("click",function(){showTab(b.dataset.tab);});});
+
+/* ---------- credits ---------- */
+(function(){
+  var ol=$("#repoList");
+  REPOS.forEach(function(r,i){
+    ol.appendChild(h("li",null,h("span",{class:"ix",text:String(i+1)}),
+      h("div",{style:"min-width:0"},h("a",{href:"https://github.com/"+r[0],target:"_blank",rel:"noopener",text:r[0]}),h("p",{text:r[1]}))));
+  });
+  $("#openCredits").addEventListener("click",function(){$("#credits").hidden=false;$("#credits").scrollTop=0;});
+  $("#closeCredits").addEventListener("click",function(){$("#credits").hidden=true;});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")$("#credits").hidden=true;});
+})();
+
+/* ---------- Section 1: Directory ---------- */
+var D={dim:"role",val:"All",q:"",saved:false,open:{}};
+var favs=lsGet("epc-fav",[]);
+function dimValues(){return D.dim==="role"?ROLES:D.dim==="task"?TASKS:PROJECTS;}
+function dimIdx(){return D.dim==="role"?1:D.dim==="task"?2:3;}
+function renderDirectory(){
+  var root=$("#p1");root.textContent="";
+  root.appendChild(h("div",{class:"lead"},h("h2",{id:"t1",text:"Prompt Directory"}),h("span",{text:"50 professional prompts, each built the same way: role, objective, inputs, process, rules, output format and a quality check. Highlighted brackets are the parts you fill in."})));
+  var seg=h("div",{class:"seg",role:"group","aria-label":"Browse by"});
+  [["role","Role"],["task","Task"],["project","Project"]].forEach(function(x){
+    seg.appendChild(h("button",{type:"button","aria-pressed":String(D.dim===x[0]),text:x[1],onclick:function(){D.dim=x[0];D.val="All";renderDirectory();}}));
+  });
+  root.appendChild(seg);
+  var chips=h("div",{class:"chips"});
+  function chip(v){
+    var n=P.filter(function(p){return v==="All"||p[dimIdx()]===v;}).length;
+    chips.appendChild(h("button",{class:"chip",type:"button","aria-pressed":String(D.val===v),onclick:function(){D.val=v;renderDirectory();}},v,h("span",{class:"n",text:String(n)})));
+  }
+  chip("All");dimValues().forEach(chip);
+  root.appendChild(chips);
+  var search=h("input",{class:"search",id:"dsearch",type:"search",placeholder:"Search prompts",value:D.q,"aria-label":"Search prompts"});
+  search.addEventListener("input",function(){D.q=search.value;renderList();});
+  root.appendChild(h("div",{class:"tools"},search,
+    h("button",{class:"chip",type:"button","aria-pressed":String(D.saved),onclick:function(){D.saved=!D.saved;renderDirectory();}},"Saved",h("span",{class:"n",text:String(favs.length)}))));
+  root.appendChild(h("div",{class:"count",id:"dcount"}));
+  root.appendChild(h("div",{class:"list",id:"dlist"}));
+  renderList();
+}
+function renderList(){
+  var q=D.q.trim().toLowerCase(),list=$("#dlist");list.textContent="";
+  var items=P.map(function(p,i){return {p:p,i:i};}).filter(function(o){
+    var p=o.p;
+    if(D.val!=="All"&&p[dimIdx()]!==D.val)return false;
+    if(D.saved&&favs.indexOf(o.i)<0)return false;
+    if(q&&(p[0]+" "+p[1]+" "+p[2]+" "+p[3]+" "+p[4]+" "+p[6]).toLowerCase().indexOf(q)<0)return false;
+    return true;});
+  $("#dcount").textContent=items.length+" of "+P.length+" prompts";
+  if(!items.length){list.appendChild(h("div",{class:"empty",text:D.saved?"No saved prompts yet. Tap the star on any prompt.":"Nothing matches. Try a different word or clear the filter."}));return;}
+  items.forEach(function(o){
+    var p=o.p,i=o.i,isFav=favs.indexOf(i)>=0,open=!!D.open[i];
+    var pre=h("pre",{class:"pr"+(open?"":" clip"),tabindex:"0",role:"button","aria-expanded":String(open),title:"Tap to expand"},phSpans(p[6]));
+    function toggle(){D.open[i]=!D.open[i];renderList();}
+    pre.addEventListener("click",toggle);
+    pre.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle();}});
+    var star=h("button",{class:"star",type:"button","aria-pressed":String(isFav),"aria-label":(isFav?"Remove ":"Save ")+p[0],text:isFav?"★":"☆",onclick:function(){
+      var k=favs.indexOf(i);if(k<0)favs.push(i);else favs.splice(k,1);lsSet("epc-fav",favs);
+      if(D.saved)renderDirectory();else renderList();}});
+    var pat=h("div",{class:"pat"},"Pattern: "+p[4]+". From ");
+    p[5].forEach(function(r,j){if(j)pat.appendChild(document.createTextNode(", "));
+      pat.appendChild(h("a",{href:"https://github.com/"+repoLink(r),target:"_blank",rel:"noopener",text:repoLink(r).split("/")[1]}));});
+    list.appendChild(h("article",{class:"card"},
+      h("div",{class:"card-h"},h("h3",{text:p[0]}),star),
+      h("div",{class:"tags"},h("span",{class:"tag role",text:p[1]}),h("span",{class:"tag",text:p[2]}),h("span",{class:"tag",text:p[3]})),
+      pre,
+      h("div",{class:"acts"},
+        h("button",{class:"btn primary",type:"button",text:"Copy prompt",onclick:function(){copyText(p[6]);}}),
+        h("button",{class:"btn ghost",type:"button",text:open?"Collapse":"Expand",onclick:toggle})),
+      pat));
+  });
+}
+
+/* ---------- Section 2: Navigator ---------- */
+var N={goal:-1,stage:"scratch",done:{}};
+function renderNavigator(){
+  var root=$("#p2");root.textContent="";
+  root.appendChild(h("div",{class:"lead"},h("h2",{id:"t2",text:"Goal Navigator"}),h("span",{text:"Pick what you want to accomplish. You get a short sequence of prompts to feed your chatbot one at a time."})));
+  if(N.goal<0){
+    var grid=h("div",{class:"goals"});
+    GOALS.forEach(function(g,i){
+      grid.appendChild(h("button",{class:"goal",type:"button",onclick:function(){N.goal=i;N.done={};renderNavigator();window.scrollTo(0,0);}},
+        h("b",{text:g.n}),h("span",{text:g.d}),h("em",{text:g.steps.length+" prompts"})));
+    });
+    root.appendChild(grid);return;
+  }
+  var g=GOALS[N.goal],steps=stepsFor(N.goal);
+  root.appendChild(h("button",{class:"back",type:"button",text:"← All goals",onclick:function(){N.goal=-1;renderNavigator();}}));
+  root.appendChild(h("h3",{style:"font-size:22px;margin:4px 0 6px",text:g.n}));
+  var seg=h("div",{class:"seg",role:"group","aria-label":"Starting point"});
+  [["scratch","Starting from scratch"],["material","I already have material"]].forEach(function(x){
+    seg.appendChild(h("button",{type:"button","aria-pressed":String(N.stage===x[0]),text:x[1],onclick:function(){N.stage=x[0];N.done={};renderNavigator();}}));});
+  root.appendChild(seg);
+  var wrap=h("div",{class:"steps"});
+  steps.forEach(function(s,i){
+    var done=!!N.done[i];
+    var cb=h("input",{type:"checkbox",id:"nd"+i,checked:done?true:false});
+    cb.addEventListener("change",function(){N.done[i]=cb.checked;renderNavigator();});
+    wrap.appendChild(h("article",{class:"step"+(done?" done":"")},
+      h("div",{class:"step-h"},h("span",{class:"step-n",text:"STEP "+(i+1)+"/"+steps.length}),h("h3",{text:s[0]}),
+        h("label",{class:"check",for:"nd"+i},cb,"Done")),
+      h("p",{class:"why",text:s[1]}),
+      h("pre",{class:"pr"},phSpans(s[2])),
+      h("div",{class:"acts"},h("button",{class:"btn primary",type:"button",text:"Copy step "+(i+1),onclick:function(){copyText(s[2]);}}))));
+  });
+  root.appendChild(wrap);
+  function allText(){
+    return "# "+g.n+"\n\nFeed these to your chatbot one at a time. Fill the [BRACKETS] first.\n\n"+
+      steps.map(function(s,i){return "## Step "+(i+1)+": "+s[0]+"\n"+s[1]+"\n\n"+s[2];}).join("\n\n")+"\n\n---\nBuilt with Elevated Prompt City.\n";
+  }
+  root.appendChild(h("div",{class:"bar"},
+    h("button",{class:"btn primary",type:"button",text:"Copy all steps",onclick:function(){copyText(allText());}}),
+    h("button",{class:"btn",type:"button",text:"Export .md",onclick:function(){saveMd(slug(g.n)+".md",allText());}})));
+}
+
+/* ---------- Section 3: Foundry ---------- */
+var F={type:"site",vals:{}};
+function loadVals(){F.vals=lsGet("epc-f-"+F.type,{});}
+function typeObj(){return TYPES.filter(function(t){return t.id===F.type;})[0];}
+function labelOf(k){var fs=fieldsOf(typeObj());for(var i=0;i<fs.length;i++)if(fs[i][0]===k)return fs[i][1].toUpperCase();return k.toUpperCase();}
+function segments(){
+  var out=[];tplFor(typeObj()).split(/(\{\{\w+\}\})/).forEach(function(s){
+    var m=/^\{\{(\w+)\}\}$/.exec(s);
+    if(!m){if(s)out.push({t:"text",v:s});return;}
+    var v=(F.vals[m[1]]||"").trim();
+    out.push(v?{t:"fill",v:v}:{t:"empty",v:"["+labelOf(m[1])+"]"});});
+  return out;
+}
+function plainPrompt(){return segments().map(function(s){return s.v;}).join("");}
+function renderPreview(){
+  var fs=fieldsOf(typeObj()),pre=$("#fprev");pre.textContent="";
+  segments().forEach(function(s){
+    if(s.t==="text")pre.appendChild(document.createTextNode(s.v));
+    else if(s.t==="fill")s.v.split(/(\[[^\]\n]+\])/).forEach(function(x){if(!x)return;pre.appendChild(h("span",{class:/^\[[^\]]+\]$/.test(x)?"ph":"fill",text:x}));});
+    else pre.appendChild(h("span",{class:"ph",text:s.v}));});
+  var n=fs.filter(function(f){return (F.vals[f[0]]||"").trim();}).length;
+  $("#fbar").style.width=Math.round(n/fs.length*100)+"%";
+  $("#fprog").textContent=n+" of "+fs.length+" fields filled";
+}
+function loadSample(i){
+  var t=typeObj();F.vals=Object.assign({},t.samples[i].v);lsSet("epc-f-"+F.type,F.vals);
+  renderFoundry();toast("Sample loaded. Edit any field.");
+}
+function renderFoundry(){
+  var root=$("#p3");root.textContent="";loadVals();
+  var t=typeObj(),fs=fieldsOf(t);
+  root.appendChild(h("div",{class:"lead"},h("h2",{id:"t3",text:"Project Foundry"}),h("span",{text:"Choose what you are making, fill in the fields, and the full build prompt below updates as you type. Not sure what to write? Load a sample and edit it."})));
+  var chips=h("div",{class:"chips"});
+  TYPES.forEach(function(x){chips.appendChild(h("button",{class:"chip",type:"button","aria-pressed":String(F.type===x.id),text:x.label,onclick:function(){F.type=x.id;renderFoundry();}}));});
+  root.appendChild(chips);
+  root.appendChild(h("div",{class:"count",text:"Load a sample"}));
+  var sc=h("div",{class:"chips"});
+  t.samples.forEach(function(s,i){sc.appendChild(h("button",{class:"chip",type:"button",text:s.l,onclick:function(){loadSample(i);}}));});
+  root.appendChild(sc);
+  var form=h("div",{class:"form"});
+  fs.forEach(function(f){
+    var k=f[0],hint=(t.hint&&t.hint[k])||f[2],id="f-"+k;
+    var el=f[3]?h("textarea",{id:id,rows:"3",placeholder:hint}):h("input",{id:id,type:"text",placeholder:hint});
+    el.value=F.vals[k]||"";
+    el.addEventListener("input",function(){F.vals[k]=el.value;lsSet("epc-f-"+F.type,F.vals);renderPreview();});
+    form.appendChild(h("div",{class:"field"},h("label",{for:id,text:f[1]}),el));
+  });
+  root.appendChild(form);
+  root.appendChild(h("div",{class:"prog"},h("i",{id:"fbar"})));
+  root.appendChild(h("div",{class:"prog-t",id:"fprog"}));
+  root.appendChild(h("div",{class:"bar"},
+    h("button",{class:"btn ghost",type:"button",text:"Clear all fields",onclick:function(){F.vals={};lsSet("epc-f-"+F.type,F.vals);renderFoundry();}})));
+  root.appendChild(h("h3",{class:"prev-h",text:"Your full prompt"}));
+  root.appendChild(h("pre",{class:"pr prev",id:"fprev"}));
+  root.appendChild(h("div",{class:"bar"},
+    h("button",{class:"btn primary",type:"button",text:"Copy prompt",onclick:function(){copyText(plainPrompt());}}),
+    h("button",{class:"btn",type:"button",text:"Export .md",onclick:function(){
+      var nm=(F.vals.name||"").trim()||t.label;
+      saveMd(slug(nm)+"-prompt.md","# "+nm+" ("+t.label+")\n\n```\n"+plainPrompt()+"\n```\n\nBuilt with Elevated Prompt City.\n");}})));
+  renderPreview();
+}
+
+/* ---------- Start Here: a first lesson for complete beginners ---------- */
+var PLAYLIST="https://www.youtube.com/playlist?list=PLy9mLEnHHo4XLPIgN0NQkY8rcqw-eMutg";
+var VIDS=25;
+var watched=lsGet("epc-vid",[]);
+var FACTS=[
+["It writes by predicting.","A chatbot predicts the most likely next words from patterns it learned. Unless it has a search tool, it is not looking anything up, and it does not know you."],
+["It only knows what is in the chat.","Your idea, your audience, your rules. If you do not say them, it guesses."],
+["It can sound sure and be wrong.","Check names, numbers, dates and sources before you use them."],
+["Clear instructions beat a fancier chatbot.","Most bad answers come from unclear questions. That is the one thing you can fix today."]
+];
+var COMPARE=[
+["Write a post about my business.",
+ "You are a social media writer for a small bakery. Write one Instagram caption announcing our new sourdough loaf for local families. Warm and playful, under 60 words, ending with a question.",
+ "It says who the chatbot is, what to write, who it is for, the tone, the length and the ending."],
+["Help me study biology.",
+ "I am a first-year student with a cell biology exam in 2 weeks. Make a 7-day study plan with 45 minutes a day. End each day with 5 quiz questions.",
+ "It gives your situation, the deadline, the time you have, and the shape of the answer."],
+["Make my CV better.",
+ "Here is my CV: [PASTE CV]. I am applying for [JOB]. List the 5 weakest lines, explain why each is weak, and rewrite each one. Do not invent experience.",
+ "You supply the material and say what the chatbot must not do."]
+];
+var FIVE="You are [WHO THE CHATBOT SHOULD BE].\nI want [WHAT YOU WANT DONE].\nHere is what you need to know: [YOUR SITUATION, AUDIENCE, FACTS].\nRules: [LIMITS AND THINGS TO AVOID].\nGive the answer as [FORMAT AND LENGTH].\nIf anything is unclear, ask me up to 3 questions before you answer.";
+var FIVE_PARTS=[["Who","Role","Gives the chatbot a point of view."],["What","Objective","The one thing you want done."],["Context","Inputs","Everything it cannot guess."],["Rules","Rules","Limits, and things to avoid."],["Format","Output","How the answer should look."]];
+var WEEK=[
+["Day 1","Meet your chatbot","Open any free chatbot (ChatGPT, Claude or Gemini). Ask it to explain AI as if you were 12, then ask two follow-up questions. Watch the first few videos of the playlist above.",null],
+["Day 2","Say what you mean","Take one rough idea you have and let the chatbot interview you about it.",{type:"prompt",t:"Idea Clarifier",l:"Open Idea Clarifier"}],
+["Day 3","Fix a weak prompt","Paste a prompt that gave you a poor answer and have it rewritten.",{type:"prompt",t:"Prompt Rewriter",l:"Open Prompt Rewriter"}],
+["Day 4","Summarise something real","Paste an article or notes you need to understand and get a structured summary.",{type:"prompt",t:"Structured Summary",l:"Open Structured Summary"}],
+["Day 5","Learn something new","Pick a topic you have always wanted to understand and have it taught from zero.",{type:"prompt",t:"Teach Me From Zero",l:"Open Teach Me From Zero"}],
+["Day 6","Follow a full sequence","Use the goal guide to turn a raw idea into a one-page brief, one prompt at a time.",{type:"goal",g:0,l:"Open the idea-to-brief guide"}],
+["Day 7","Build something","Load the small-brand website sample, read the prompt it builds, then swap in your own details.",{type:"foundry",f:"site",s:0,l:"Open the website builder"}]
+];
+var SAFE=[
+"Do not paste passwords, ID numbers, bank details, or private information about other people.",
+"Check facts, numbers, dates and quotes before you use or share them.",
+"Say what you do not want as well as what you do want.",
+"If an answer is off, do not start over. Tell the chatbot exactly what to change.",
+"You decide. The chatbot drafts and you approve."
+];
+function openPrompt(title){D.dim="role";D.val="All";D.saved=false;D.q=title;renderDirectory();showTab("1");}
+function openGoal(i){N.goal=i;N.done={};renderNavigator();showTab("2");}
+function openFoundry(type,s){F.type=type;renderFoundry();if(s!=null)loadSample(s);showTab("3");}
+function sec(title,sub){return h("div",null,h("h2",{class:"secthead",text:title}),sub?h("p",{class:"sub2",text:sub}):null);}
+function renderStart(){
+  var root=$("#p0");root.textContent="";
+  root.appendChild(h("div",{class:"lead"},h("h2",{id:"t0",text:"New to AI? Start here."}),
+    h("span",{text:"About 30 minutes takes you from “what is AI?” to writing a prompt that gets a useful answer. After that, the rest of the City does the heavy lifting."})));
+
+  root.appendChild(sec("Four things to know first"));
+  var ol=h("ol",{class:"facts"});
+  FACTS.forEach(function(f){ol.appendChild(h("li",null,h("b",{text:f[0]})," "+f[1]));});
+  root.appendChild(h("article",{class:"card"},ol));
+
+  root.appendChild(sec("See the difference","The chatbot is the same. Only the instructions changed."));
+  COMPARE.forEach(function(c){
+    root.appendChild(h("article",{class:"card"},
+      h("div",{class:"cmp"},
+        h("div",{class:"cmp-s weak"},h("span",{class:"tag",text:"Weak prompt"}),h("p",null,phSpans(c[0]))),
+        h("div",{class:"cmp-s strong"},h("span",{class:"tag role",text:"Strong prompt"}),h("p",null,phSpans(c[1])))),
+      h("p",{class:"why",text:"Why it works: "+c[2]}),
+      h("div",{class:"acts"},h("button",{class:"btn",type:"button",text:"Copy the strong one",onclick:function(){copyText(c[1]);}}))));
+  });
+
+  root.appendChild(sec("The 5-part prompt","Every prompt in this City is built from these five parts. Start with this short version."));
+  var parts=h("div",{class:"tags"});
+  FIVE_PARTS.forEach(function(p){parts.appendChild(h("span",{class:"tag role",text:p[0]+" = "+p[1]}));});
+  root.appendChild(h("article",{class:"card"},parts,
+    h("pre",{class:"pr"},phSpans(FIVE)),
+    h("div",{class:"acts"},h("button",{class:"btn primary",type:"button",text:"Copy the template",onclick:function(){copyText(FIVE);}}))));
+
+  root.appendChild(sec("Watch and practise","A free video course, plus a way to track your progress."));
+  var count=h("span",{id:"vcount",class:"count"});
+  function upd(){count.textContent=watched.length+" of "+VIDS+" videos watched";}
+  var grid=h("div",{class:"vids",role:"group","aria-label":"Videos watched"});
+  for(var n=1;n<=VIDS;n++)(function(n){
+    var b=h("button",{class:"vid"+(watched.indexOf(n)>=0?" on":""),type:"button","aria-pressed":String(watched.indexOf(n)>=0),"aria-label":"Video "+n,text:String(n)});
+    b.addEventListener("click",function(){
+      var k=watched.indexOf(n);if(k<0)watched.push(n);else watched.splice(k,1);
+      lsSet("epc-vid",watched);b.classList.toggle("on",k<0);b.setAttribute("aria-pressed",String(k<0));upd();});
+    grid.appendChild(b);
+  })(n);
+  upd();
+  root.appendChild(h("article",{class:"pl"},
+    h("span",{class:"k",text:"Free video course"}),
+    h("h3",{text:"ChatGPT for Beginners"}),
+    h("p",{text:"By Sabrina Ramonov on YouTube. "+VIDS+" videos, starting from zero. The habits carry over to Claude and Gemini too."}),
+    h("a",{class:"btn",href:PLAYLIST,target:"_blank",rel:"noopener",text:"Open the playlist"})));
+  root.appendChild(h("article",{class:"card"},
+    h("h3",{text:"How to use it"}),
+    h("ol",{class:"facts"},
+      h("li",{text:"Watch one or two videos at a time, not a whole evening."}),
+      h("li",{text:"After each video, pause and try one idea in a real chat. Use a prompt from the Directory."}),
+      h("li",{text:"Tap the number below when you finish that video, counting in playlist order."})),
+    count,grid));
+
+  root.appendChild(sec("Your first week","One small task a day. Each button opens the right tool."));
+  var wk=h("div",{class:"steps"});
+  WEEK.forEach(function(d){
+    var act=null;
+    if(d[3]){
+      act=h("div",{class:"acts"},h("button",{class:"btn primary",type:"button",text:d[3].l,onclick:function(){
+        if(d[3].type==="prompt")openPrompt(d[3].t);
+        else if(d[3].type==="goal")openGoal(d[3].g);
+        else openFoundry(d[3].f,d[3].s);}}));
+    }
+    wk.appendChild(h("article",{class:"step"},
+      h("div",{class:"step-h"},h("span",{class:"step-n",text:d[0].toUpperCase()}),h("h3",{text:d[1]})),
+      h("p",{class:"why",text:d[2]}),act));
+  });
+  root.appendChild(wk);
+
+  root.appendChild(sec("Use it safely"));
+  var ul=h("ul",{class:"safe"});
+  SAFE.forEach(function(s){ul.appendChild(h("li",{text:s}));});
+  root.appendChild(h("article",{class:"card"},ul));
+
+  root.appendChild(sec("How the City fits together"));
+  var map=h("div",{class:"map"});
+  [["Directory","50 ready prompts by role, task and project.","1"],["Navigator","Pick a goal and get the prompts in order.","2"],["Foundry","Fill in a form and get a full build prompt.","3"]].forEach(function(m){
+    map.appendChild(h("button",{class:"map-r",type:"button",onclick:function(){showTab(m[2]);}},
+      h("span",null,h("b",{text:m[0]}),h("small",{text:m[1]})),h("span",{class:"go","aria-hidden":"true",text:"Open →"})));
+  });
+  root.appendChild(map);
+}
+
+/* ---------- boot ---------- */
+renderStart();renderDirectory();renderNavigator();renderFoundry();showTab(["0","1","2","3"].indexOf(tab)>=0?tab:"0");
+window.scrollTo(0,0);
+})();
+</script>

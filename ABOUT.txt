@@ -1,0 +1,11 @@
+Repository name: elevated-prompt-city
+
+Description (max 350 chars):
+A free mobile-first prompt ecosystem: 50 structured prompts, 8 goal sequences, a project builder, and a beginner's start-here path into AI.
+
+Website: (add your GitHub Pages or Vercel URL here)
+
+Topics:
+prompt-engineering, prompts, prompt-library, ai, chatgpt, claude, llm, generative-ai, ai-education, beginners, prompt-templates, context-engineering, vanilla-js, pwa, mobile-first, accessibility
+
+Social preview: docs/social-preview.png (1280 x 640)
