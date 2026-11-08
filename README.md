@@ -4,7 +4,7 @@
 
 A free, mobile-first prompt ecosystem for people who get weak answers from chatbots because their prompts are vague. It has 50 structured prompts, 8 goal sequences, and a project builder that turns a short form into a complete build brief.
 
-Built by [The Elevation Citadel](https://github.com/) · Tagline: *Connect. Craft. Elevate.*
+Built by The Elevation Citadel · Tagline: *Connect. Craft. Elevate.*
 
 ![Elevated Prompt City preview](docs/social-preview.png)
 
