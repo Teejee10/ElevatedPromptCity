@@ -60,8 +60,6 @@ The beginner video course linked in **Start Here** is *ChatGPT for Beginners* by
 
 Issues and pull requests are welcome, especially for new prompts. Please keep prompts original, include a short example, and follow the seven-part structure above.
 
-## License
+---
 
-Free to copy, share and adapt with credit to The Elevation Citadel. Not for sale or commercial use.
-
-Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). See [LICENSE](LICENSE).
+@The Elevation Citadel
