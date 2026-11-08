@@ -152,6 +152,17 @@ nav.tabs button[aria-selected="true"]{background:var(--brand);color:var(--gold)}
 .safe li::before{content:"";flex:none;width:10px;height:10px;border-radius:3px;background:var(--gold);border:1px solid var(--brand);margin-top:7px}
 @media (max-width:560px){.cmp{grid-template-columns:1fr}}
 @media (max-width:420px){nav.tabs button{padding:8px 2px}nav.tabs button b{font-size:13.5px;white-space:nowrap}nav.tabs button small{font-size:10px;letter-spacing:.02em;white-space:nowrap}nav.tabs .in{gap:4px}}
+.connect{margin-top:24px}
+.connect h2{font-size:22px;margin-bottom:4px}
+.connect .sub2{margin:0 0 12px;color:var(--ink2);font-size:14px}
+.links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.links li{min-width:0}
+.links a{display:flex;flex-direction:column;gap:2px;height:100%;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.links a:hover{border-color:var(--accent)}
+.links b{font-family:var(--f-display);font-size:15px}
+.links span{font-size:13px;color:var(--ink2);overflow-wrap:anywhere}
+.links .full{grid-column:1/-1}
+@media (max-width:380px){.links{grid-template-columns:1fr}}
 @media (max-width:380px){.goals{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -181,6 +192,18 @@ nav.tabs button[aria-selected="true"]{background:var(--brand);color:var(--gold)}
     <section id="p3" aria-labelledby="t3" hidden></section>
   </main>
   <footer class="foot">
+    <section class="connect" aria-labelledby="tc">
+      <h2 id="tc">Connect</h2>
+      <p class="sub2">Follow, message or book a call.</p>
+      <ul class="links">
+        <li><a href="https://www.instagram.com/theelevatedjames" target="_blank" rel="noopener"><b>Personal</b><span>@theelevatedjames</span></a></li>
+        <li><a href="https://www.instagram.com/elevatedjamesdesigns" target="_blank" rel="noopener"><b>The Elevation Citadel</b><span>@elevatedjamesdesigns</span></a></li>
+        <li><a href="https://www.linkedin.com/in/theelevatedjames" target="_blank" rel="noopener"><b>LinkedIn</b><span>/in/theelevatedjames</span></a></li>
+        <li><a href="https://t.me/ElevatedJames" target="_blank" rel="noopener"><b>Telegram</b><span>@ElevatedJames</span></a></li>
+        <li><a href="https://substack.com/@theelevatedjames" target="_blank" rel="noopener"><b>Substack</b><span>@theelevatedjames</span></a></li>
+        <li><a class="full" href="mailto:tijwokjames@yahoo.com"><b>Email</b><span>tijwokjames@yahoo.com</span></a></li>
+      </ul>
+    </section>
     <button class="credits-btn" id="openCredits" type="button"><span><b>Credits</b><small>Built on 30 open-source GitHub repos</small></span><span class="go" aria-hidden="true">View all &rarr;</span></button>
   </footer>
 </div>
